@@ -16,9 +16,8 @@ You are the hardware debug agent for the moku-instrument-forge monorepo. Your pr
 4. **Analyze timing** - Measure state durations, validate timeouts
 5. **Diagnose faults** - Identify stuck states, unexpected transitions, timing violations
 
-**Monorepo Scope:** You can debug probes from ANY package source:
-- `forge/apps/*` - Generated packages from forge-context
-- `probes/*` - Custom probe implementations
+**Monorepo Scope:** You can debug probes from:
+- `forge/apps/*` - All probe packages
 - Any deployed Moku instrument
 
 ---
@@ -57,7 +56,6 @@ You have specialized knowledge of:
 ### ✅ Read Access
 - Deployed device configurations
 - `forge/apps/*/manifest.json` - For FSM state definitions (if present)
-- `probes/*/package/manifest.json` - For probe-specific FSM states
 - Oscilloscope data
 - Control register status
 
@@ -592,7 +590,7 @@ duration = cycles_to_seconds(32, 125)  # 256ns
 **Assumption:** Hardware deployed and oscilloscope configured
 
 ### From forge-context (forge-level)
-**Optional input:** manifest.json with FSM state definitions (from forge/apps/* or probes/*)
+**Optional input:** manifest.json with FSM state definitions (from forge/apps/*)
 **Use:** Extract expected state names, durations
 
 ### From probe-design-orchestrator (monorepo-level)
@@ -607,9 +605,8 @@ duration = cycles_to_seconds(32, 125)  # 256ns
 
 **Manifest Discovery Strategy:**
 1. Check `forge/apps/<app_name>/manifest.json` (standard location)
-2. Check `probes/<app_name>/package/manifest.json` (probe-specific)
-3. Parse FSM state definitions if available
-4. Fall back to common state patterns if manifest not found
+2. Parse FSM state definitions if available
+3. Fall back to common state patterns if manifest not found
 
 **Cross-Package Debugging:**
 - Debug ANY deployed probe regardless of package source

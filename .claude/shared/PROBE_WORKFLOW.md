@@ -28,8 +28,6 @@ forge/apps/<probe_name>/
 └── (ready for YAML specification)
 ```
 
-**Note:** Option A uses `forge/apps/` as the primary workspace. The `probes/` directory is deprecated.
-
 ---
 
 ### Step 2: Write YAML Specification
@@ -331,7 +329,7 @@ Issue 3: Direct CR reference found: Control6(15 downto 0)
 
 **Required:**
 - VHDL files from forge/apps/<probe_name>/
-- Custom VHDL from probes/<probe_name>/vhdl/
+- Custom VHDL from forge/apps/<probe_name>/
 - Moku build toolchain
 
 **Output:**
@@ -456,11 +454,11 @@ Press Ctrl+C to stop monitoring...
 **Quick iteration workflow:**
 
 1. **Tweak YAML** (adjust defaults, add signals)
-2. **Regenerate:** `/workflow iterate probes/<probe_name>/specs/<probe_name>.yaml --deploy`
+2. **Regenerate:** `/workflow iterate forge/apps/<probe_name>/<probe_name>.yaml --deploy`
 3. **Verify:** `/monitor-state <probe_name>`
 
 **Custom VHDL changes:**
-1. Edit `probes/<probe_name>/vhdl/*.vhd`
+1. Edit `forge/apps/<probe_name>/*.vhd`
 2. Cross-validate: `/cross-validate <probe_name>`
 3. Recompile bitstream (external)
 4. Redeploy: `/deploy <probe_name> --device <ip> --force`
@@ -481,7 +479,7 @@ Quick YAML tweaks during development, skip validation for speed
 1. **Edit YAML** (adjust defaults, mapping strategy)
 2. **Regenerate + redeploy:**
    ```
-   /workflow iterate probes/<probe_name>/specs/<probe_name>.yaml --deploy
+   /workflow iterate forge/apps/<probe_name>/<probe_name>.yaml --deploy
    ```
 3. **Verify:** `/monitor-state <probe_name>`
 
@@ -525,7 +523,7 @@ Probe deployed but not behaving as expected
    - Verify user hasn't changed values
 
 5. **Review VHDL logic:**
-   - Load `probes/<probe_name>/vhdl/*.vhd`
+   - Load `forge/apps/<probe_name>/*.vhd`
    - Check FSM transitions
    - Verify output logic
 
