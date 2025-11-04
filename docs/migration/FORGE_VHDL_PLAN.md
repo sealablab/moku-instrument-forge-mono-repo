@@ -75,19 +75,89 @@ Context window impact: MINIMAL
 
 ---
 
-## Two-Phase Migration Strategy
+## Multi-Phase Migration Strategy
 
-### Phase 1: Infrastructure Setup (Foundation)
+### Phase 1: Infrastructure Setup (Foundation) ✅ COMPLETE
+**Status:** ✅ Complete (2025-11-04, v2.0.0)
 **Goal:** Install CocoTB + GHDL filter infrastructure into `libs/forge-vhdl`
 **Scope:** Copy files, create directory structure, NO component migration
 **Outcome:** Testing framework ready, docs in place
-**Duration:** ~30 minutes (mostly copying)
+**Duration:** ~30 minutes (actual)
+**Details:** See [FORGE_VHDL_P1.md](FORGE_VHDL_P1.md)
 
-### Phase 2: Component Migration (Iterative)
+### Phase 2: Component Migration (Iterative) ✅ COMPLETE
+**Status:** ✅ Complete (2025-11-04, v2.0.0)
 **Goal:** Migrate components with CocoTB tests, rename to `forge_*` convention
-**Scope:** `volo_clk_divider`, `volo_lut_pkg` (+ tests from export)
+**Scope:** `volo_clk_divider` → `forge_util_clk_divider`, `volo_lut_pkg` (+ tests)
 **Outcome:** Validated components with <20 line P1 tests, docs updated
-**Duration:** ~2 hours (per component)
+**Duration:** ~2 hours (actual, per component)
+**Details:** See [FORGE_VHDL_P2.md](FORGE_VHDL_P2.md)
+
+### Phase 3: VHDL Coding Standards Integration ✅ COMPLETE
+**Status:** ✅ Complete (2025-11-04, v2.0.0)
+**Goal:** Integrate proven VHDL coding standards from EZ-EMFI
+**Scope:** VHDL_CODING_STANDARDS.md, VHDL_QUICK_REF.md, update references
+**Outcome:** Consistent design patterns, port order, FSM conventions documented
+**Duration:** ~1 hour (actual)
+**Details:** See [FORGE_VHDL_P3.md](FORGE_VHDL_P3.md)
+
+### Phase 3.5: Documentation Consolidation (v2.0) ✅ COMPLETE
+**Status:** ✅ Complete (2025-11-04, v2.0.0)
+**Goal:** Align forge-vhdl with parent monorepo's 3-tier documentation pattern
+**Scope:** Consolidate 8 docs → 5 docs, enhance CLAUDE.md, archive historical docs
+**Outcome:** 42% doc reduction, self-contained Tier 2, improved token efficiency
+**Duration:** ~2 hours (actual)
+
+**What Was Done:**
+- Enhanced CLAUDE.md (489 → 742 lines) - Now AUTHORITATIVE, self-contained
+- Enhanced llms.txt (84 → 124 lines) - Added testing quick start, hierarchy
+- Created scripts/GHDL_FILTER.md (303 lines) - Implementation details
+- Renamed VHDL_COCOTB_LESSONS_LEARNED → COCOTB_TROUBLESHOOTING
+- Archived 5 docs to docs/archive/ with timestamps:
+  - 2025-11-04_VOLO_COCOTB_TESTING_STANDARD.md
+  - 2025-11-04_COCOTB_PATTERNS.md
+  - 2025-11-04_PROGRESSIVE_TESTING_GUIDE.md
+  - 2025-11-04_GHDL_OUTPUT_FILTER.md
+  - 2025-11-04_VHDL_QUICK_REF.md
+- Removed all VOLO/EZ-EMFI references from active docs
+- Fixed voltage package test wrappers (removed real/boolean types)
+
+**Results:**
+- Before: 4,041 lines across 8 documents
+- After: 2,337 lines across 5 documents
+- Reduction: 42% (1,704 lines archived)
+- Token efficiency: 50% for design work (4k → 2k tokens)
+- Alignment: Matches parent monorepo 3-tier pattern
+
+**Documentation Hierarchy (After):**
+```
+Tier 1: llms.txt (124 lines, ~500 tokens) - Quick ref
+Tier 2: CLAUDE.md (742 lines, ~3.5k tokens) - AUTHORITATIVE
+Tier 3: Specialized docs (load as needed)
+  - docs/COCOTB_TROUBLESHOOTING.md (567 lines)
+  - docs/VHDL_CODING_STANDARDS.md (601 lines)
+  - scripts/GHDL_FILTER.md (303 lines)
+```
+
+### Phase 4: Voltage Type System Implementation ⚠️ IN PROGRESS (~40%)
+**Status:** ⚠️ In Progress (design + wrappers complete, packages pending)
+**Goal:** Implement function-based voltage type system with VHDL packages
+**Scope:** 3 VHDL packages, CocoTB tests, Python mirror classes
+**Outcome:** Type-safe voltage domains (3.3V, 5V, ±5V)
+**Duration:** ~4-6 hours (estimated remaining)
+**Details:** See [FORGE_VHDL_P4.md](FORGE_VHDL_P4.md)
+
+**What's Complete:**
+- ✅ Design finalized (VOLTAGE_TYPE_SYSTEM_DESIGN.md)
+- ✅ voltage_types_reference.py created
+- ✅ Test wrappers created for all 3 domains
+- ✅ CocoTB interface rules documented
+
+**What's Pending:**
+- ❌ VHDL package implementations (forge_voltage_*_pkg.vhd)
+- ❌ CocoTB test implementations
+- ❌ Python placement decision
+- ❌ Integration testing
 
 ---
 
