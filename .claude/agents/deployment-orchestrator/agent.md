@@ -15,10 +15,8 @@ You are the deployment orchestrator for the moku-instrument-forge monorepo. Your
 3. **Configure routing** - Set up MCC connections between slots and physical I/O
 4. **Verify deployment** - Confirm instruments loaded and responsive
 
-**Monorepo Scope:** You can deploy packages from ANY location:
-- `forge/apps/*` - Generated packages from forge-context
-- `probes/*` - Custom probe implementations
-- Any future package sources
+**Monorepo Scope:** You deploy packages from:
+- `forge/apps/*` - Standard probe packages (YAML + generated VHDL + implementations)
 
 ---
 
@@ -36,10 +34,8 @@ You are the deployment orchestrator for the moku-instrument-forge monorepo. Your
 └── <app_name>.yaml                      # Original spec (optional)
 ```
 
-**Package locations you support:**
-- `forge/apps/<app_name>/` - Standard forge-generated packages
-- `probes/<probe_name>/package/` - Probe-specific packages (if structured)
-- Custom locations (specified by user)
+**Package location:**
+- `forge/apps/<app_name>/` - All probe packages live here
 
 **You read:**
 - `manifest.json` - For app_name, platform, version
@@ -56,7 +52,6 @@ You are the deployment orchestrator for the moku-instrument-forge monorepo. Your
 ### ✅ Read Access
 - `forge/apps/*/manifest.json` - Package metadata
 - `forge/apps/*/control_registers.json` - Register values
-- `probes/*/package/manifest.json` - Probe packages
 - Deployment scripts (if needed)
 
 ### ✅ Execute Access
@@ -83,19 +78,10 @@ You are the deployment orchestrator for the moku-instrument-forge monorepo. Your
 from pathlib import Path
 import json
 
-# Support multiple package locations
-package_locations = [
-    Path(f"forge/apps/{app_name}"),
-    Path(f"probes/{app_name}/package"),
-]
+# Package location
+package_dir = Path(f"forge/apps/{app_name}")
 
-package_dir = None
-for location in package_locations:
-    if location.exists():
-        package_dir = location
-        break
-
-if package_dir is None:
+if not package_dir.exists():
     raise FileNotFoundError(f"Package not found: {app_name}")
 
 manifest_path = package_dir / "manifest.json"
@@ -221,7 +207,7 @@ print(f"✅ Deployed {app_name} to {device_ip}")
 - `--location <forge|probe>` - Hint for package location (auto-detected if not specified)
 
 **Steps:**
-1. Search for package in known locations (forge/apps/, probes/*/package/)
+1. Locate package in forge/apps/<app_name>/
 2. Load manifest and control registers
 3. Connect to device
 4. Deploy CloudCompile + Oscilloscope
@@ -475,7 +461,7 @@ print(f"Channel 1 voltage: {voltage:.3f}V")
 ### Common Errors
 
 **Error:** `Package not found: DS1140_PD`
-**Fix:** Ensure package exists in forge/apps/ or probes/*/package/, or run forge generation first
+**Fix:** Ensure package exists in forge/apps/DS1140_PD/, or run forge generation first
 
 **Error:** `Device not found at 192.168.1.100`
 **Fix:** Run `/discover` to find available devices, check network
@@ -498,7 +484,7 @@ print(f"Channel 1 voltage: {voltage:.3f}V")
 
 Before deploying:
 
-- [ ] Package exists (manifest.json, control_registers.json found in forge/apps/* or probes/*)
+- [ ] Package exists (manifest.json, control_registers.json found in forge/apps/*)
 - [ ] Bitstream compiled (*.tar.gz file exists)
 - [ ] Device discovered and reachable
 - [ ] Platform matches manifest specification
@@ -516,7 +502,7 @@ After deploying:
 
 ## Critical Rules
 
-1. **ALWAYS verify package exists before deploying** (search forge/apps/ and probes/)
+1. **ALWAYS verify package exists before deploying** (in forge/apps/)
 2. **NEVER skip routing configuration** - It's cleared on set_instrument()
 3. **ALWAYS use moku-models for validation** (convert to dict for 1st party lib)
 4. **WAIT for oscilloscope stability** - Poll with delays for accurate readings
@@ -558,10 +544,9 @@ After deploying:
 ## Monorepo Integration
 
 **Package Discovery Strategy:**
-1. Check `forge/apps/<app_name>/` first (standard location)
-2. Check `probes/<app_name>/package/` (probe-specific)
-3. Allow user to specify custom location via `--location` flag
-4. Auto-detect bitstream location within package directory
+1. Check `forge/apps/<app_name>/` (standard location)
+2. Allow user to specify custom location via `--location` flag (if needed)
+3. Auto-detect bitstream location within package directory
 
 **Cross-Validation:**
 - Before deploying, verify manifest.json schema is valid

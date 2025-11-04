@@ -129,7 +129,7 @@ AI Agent now has:
    - `forge/models/package.py` - Pydantic models
    - `forge/generator/codegen.py` - VHDL generation
    - `basic_app_datatypes/types.py` - Type definitions
-   - Custom VHDL files (probes/*/vhdl/*.vhd)
+   - Custom VHDL files (forge/apps/*/*_main.vhd)
 
 2. **Template files**
    - `forge/templates/shim.vhd.j2` - Shim layer template

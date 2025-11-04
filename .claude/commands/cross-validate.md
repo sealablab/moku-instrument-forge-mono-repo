@@ -94,7 +94,7 @@ No issues found. Probe ready for compilation and deployment.
 
 Probe: DS1180_LASER
 Package: forge/apps/DS1180_LASER/
-VHDL: probes/DS1180_LASER/vhdl/
+VHDL: forge/apps/DS1180_LASER/vhdl/
 
 Signal verification:
   ✅ laser_intensity (voltage_output_05v_s16)
@@ -245,7 +245,7 @@ datatypes:
 
 Then regenerate package:
 ```
-/generate probes/DS1180_LASER/specs/DS1180_LASER.yaml --force
+/generate forge/apps/DS1180_LASER/specs/DS1180_LASER.yaml --force
 ```
 
 **Fix Option 2 - Remove from VHDL:**
@@ -336,9 +336,9 @@ If deployment fails, cross-validation may reveal mismatches.
 ```
 1. /init-probe DS1220_OPTICAL
 2. [Edit YAML spec]
-3. /validate probes/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
-4. /generate probes/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
-5. [Write custom VHDL in probes/DS1220_OPTICAL/vhdl/]
+3. /validate forge/apps/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
+4. /generate forge/apps/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
+5. [Write custom VHDL in forge/apps/DS1220_OPTICAL/vhdl/]
 6. /cross-validate DS1220_OPTICAL  ← YOU ARE HERE
 7. [Fix any issues]
 8. /cross-validate DS1220_OPTICAL  (repeat until clean)
@@ -372,7 +372,7 @@ If deployment fails, cross-validation may reveal mismatches.
 ```
 
 **Custom VHDL:**
-All `.vhd` files in `probes/<probe_name>/vhdl/` are scanned for:
+All `.vhd` files in `forge/apps/<probe_name>/vhdl/` are scanned for:
 - Signal declarations
 - Signal usage
 - Type definitions

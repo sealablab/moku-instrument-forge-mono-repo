@@ -74,7 +74,7 @@ No issues found.
 ❌ Probe structure validation: FAILED
 
 Probe: DS1180_LASER
-Location: probes/DS1180_LASER/
+Location: forge/apps/DS1180_LASER/
 
 Required directories:
   ✅ specs/ - Found
@@ -102,8 +102,8 @@ Warnings: 3
 
 ### Missing directories
 ```bash
-mkdir -p probes/<probe_name>/docs
-mkdir -p probes/<probe_name>/tests
+mkdir -p forge/apps/<probe_name>/docs
+mkdir -p forge/apps/<probe_name>/tests
 ```
 
 ### Missing README
@@ -129,7 +129,7 @@ app_name: DS1180_LASER  # Must match directory name exactly
 ### No VHDL files
 This is expected before implementation. After package generation:
 1. Review `forge/apps/<probe_name>/*_main.vhd` template
-2. Create custom VHDL in `probes/<probe_name>/vhdl/`
+2. Create custom VHDL in `forge/apps/<probe_name>/vhdl/`
 
 ## When to Use
 
@@ -161,8 +161,8 @@ Verify probe follows standard structure before committing.
 ```
 /validate-probe-structure DS1180_LASER
 [Fix any issues]
-/validate probes/DS1180_LASER/specs/DS1180_LASER.yaml
-/generate probes/DS1180_LASER/specs/DS1180_LASER.yaml
+/validate forge/apps/DS1180_LASER/specs/DS1180_LASER.yaml
+/generate forge/apps/DS1180_LASER/specs/DS1180_LASER.yaml
 ```
 
 **Part of `/probe-status`:**
@@ -178,7 +178,7 @@ Structure validation is part of overall probe status check.
 ## Expected Directory Structure
 
 ```
-probes/<probe_name>/
+forge/apps/<probe_name>/
 ├── specs/                          # Required
 │   └── <probe_name>.yaml           # Required (exact name match)
 ├── vhdl/                           # Required (can be empty initially)
