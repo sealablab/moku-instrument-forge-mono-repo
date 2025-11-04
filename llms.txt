@@ -43,12 +43,12 @@ Authoritative Pydantic model libraries defining core abstractions:
 
 ### Probe Development (monorepo level)
 
-Active probe implementations at the monorepo root:
+Active probe implementations are located in the forge submodule under `forge/apps/`:
 
 ```
-probes/
-├── DS1120_PD/    # DS1120A probe YAML specs, VHDL implementation, tests
-└── DS1140_PD/    # DS1140A probe implementation
+forge/apps/
+├── DS1140_PD/    # Example: DS1140A probe package (YAML, generated VHDL, implementation)
+└── [other probes...]
 ```
 
 ## Common Workflows
@@ -181,11 +181,12 @@ git push
 
 ### Probe Development Workflow
 
-1. Create YAML spec in `probes/PROBE_NAME/spec/`
-2. Generate package with forge: `/workflow new-probe spec.yaml`
-3. Implement custom VHDL in `probes/PROBE_NAME/vhdl/`
-4. Deploy to hardware: `/workflow deploy PROBE_NAME`
-5. Debug with FSM monitoring: `/workflow debug PROBE_NAME`
+1. Initialize probe structure: `/init-probe PROBE_NAME`
+2. Create YAML spec in `forge/apps/PROBE_NAME/PROBE_NAME.yaml`
+3. Generate VHDL package: `/generate forge/apps/PROBE_NAME/PROBE_NAME.yaml`
+4. Implement custom VHDL in `forge/apps/PROBE_NAME/PROBE_NAME_custom_inst_main.vhd`
+5. Deploy to hardware: `/deploy PROBE_NAME --device <ip>`
+6. Debug with FSM monitoring: `/monitor-state PROBE_NAME`
 
 ## Quick Links
 

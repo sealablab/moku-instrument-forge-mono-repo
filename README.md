@@ -66,14 +66,6 @@ moku-instrument-forge-mono-repo/
 │   ├── forge-vhdl/                     # Submodule: VHDL utilities
 │   └── platform/common/                # Platform-specific VHDL (future)
 │
-├── probes/                             # DEPRECATED (see probes/README.md)
-│   └── README.md                       # Migration guide to Option A
-│
-├── archive/
-│   └── ez-emfi-probes/                 # Reference implementations (read-only)
-│       ├── DS1120_PD/                  # Old DS1120A implementation
-│       └── DS1140_PD/                  # Old DS1140A implementation
-│
 ├── .claude/                            # AI agent configurations (Phase 4)
 │   ├── agents/                         # Monorepo-level agents
 │   │   ├── deployment-orchestrator/    # Package → hardware deployment
@@ -91,8 +83,6 @@ moku-instrument-forge-mono-repo/
 - YAML specifications
 - Generated VHDL files
 - User implementation
-
-The `probes/` directory is deprecated (see `probes/README.md` for details).
 
 ---
 
@@ -245,18 +235,6 @@ cd ..
 
 ---
 
-## Archive
-
-The `archive/` directory contains reference implementations from the EZ-EMFI project:
-
-- **DS1120_PD** - DS1120A probe driver (volo-based)
-- **DS1140_PD** - DS1140A probe driver (volo-based)
-
-**Status:** Reference only, not actively maintained.
-**See:** [archive/README.md](archive/README.md) for details.
-
----
-
 ## Architecture
 
 ### Option A (Current)
@@ -271,7 +249,7 @@ The `archive/` directory contains reference implementations from the EZ-EMFI pro
 - Simple mental model: "everything in one place"
 - Works with forge as-is (no modifications needed)
 - Clear separation: source + generated in same directory
-- Validated and tested (see `OPTION_A_TEST_SUMMARY.md`)
+- Validated and tested
 
 ### Phase 4 Agent System
 
@@ -286,8 +264,6 @@ Hierarchical AI agent organization for probe development:
 - `forge-context` - YAML validation and package generation
 - `docgen-context` - Documentation generation
 - `forge-pipe-fitter` - Multi-stage pipeline coordination
-
-See `P4_AGENT_REFACTOR_HANDOFF.md` for complete Phase 4 details.
 
 ### Foundation Patterns
 
