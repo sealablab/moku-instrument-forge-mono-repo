@@ -20,42 +20,44 @@ You are the probe design orchestrator for the moku-instrument-forge monorepo. Yo
 
 ## Monorepo Architecture Awareness
 
-### Directory Structure
+### Directory Structure (Option A: forge/apps/ as primary workspace)
 ```
 moku-instrument-forge-mono-repo/
-├── probes/                         # YOUR PRIMARY DOMAIN
-│   ├── DS1140_PD/
-│   │   ├── specs/
-│   │   │   └── DS1140_PD.yaml      # Probe specification
-│   │   ├── vhdl/
-│   │   │   └── custom_logic.vhd    # User-written VHDL
-│   │   ├── docs/
-│   │   │   └── README.md
-│   │   └── tests/
-│   └── DS1180_LASER/
-│       └── ...
-│
-├── forge/                          # DELEGATE TO FORGE AGENTS
+├── forge/                          # YOUR PRIMARY DOMAIN (delegate to forge agents)
 │   ├── apps/
-│   │   ├── DS1140_PD/              # Generated package from YAML
-│   │   │   ├── manifest.json
-│   │   │   ├── control_registers.json
-│   │   │   ├── *_shim.vhd          # Auto-generated
-│   │   │   └── *_main.vhd          # Template for custom logic
+│   │   ├── DS1140_PD/              # Complete probe package
+│   │   │   ├── DS1140_PD.yaml      # ✅ Source specification
+│   │   │   ├── *_shim.vhd          # ✅ Auto-generated (from YAML)
+│   │   │   ├── *_main.vhd          # ✅ Template for user logic
+│   │   │   ├── manifest.json       # Generated metadata (future)
+│   │   │   └── README.md           # Documentation
 │   │   └── DS1180_LASER/
 │   │       └── ...
 │   └── .claude/
 │       └── agents/
-│           ├── forge-context/      # YAML → package generation
-│           ├── deployment-context/ # Package → hardware deployment
-│           ├── hardware-debug-context/
-│           ├── docgen-context/
-│           └── workflow-coordinator/
+│           ├── forge-context/              # YAML → package generation
+│           ├── deployment-orchestrator/    # Package → hardware (monorepo-level)
+│           ├── hardware-debug/             # FSM debug (monorepo-level)
+│           ├── docgen-context/             # Documentation generation
+│           └── forge-pipe-fitter/          # Workflow coordination
+│
+├── probes/                         # DEPRECATED (legacy structure, ignore)
+│   └── (partial work, not actively used)
 │
 └── .claude/                        # MONOREPO-LEVEL AGENTS (YOU)
-    └── agents/
-        └── probe-design-orchestrator/  # THIS AGENT
+    ├── agents/
+    │   ├── probe-design-orchestrator/  # THIS AGENT
+    │   ├── deployment-orchestrator/    # Hardware deployment
+    │   └── hardware-debug/             # FSM debugging
+    └── commands/
+        └── *.md                    # Monorepo-level commands
 ```
+
+**Key Changes (Option A):**
+- ✅ YAML specification lives in `forge/apps/<probe_name>/<probe_name>.yaml`
+- ✅ Generated VHDL lives alongside YAML in same directory
+- ✅ Simple mental model: "forge/apps/ is my complete workspace"
+- ❌ `probes/` directory is deprecated, not used in primary workflow
 
 ### Domain Boundaries
 

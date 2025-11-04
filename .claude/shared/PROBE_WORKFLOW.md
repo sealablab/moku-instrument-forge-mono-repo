@@ -18,30 +18,23 @@ This document provides step-by-step workflows for probe development, from initia
 - Git submodules synced (`/sync-submodules`)
 - Basic understanding of probe requirements
 
-### Step 1: Initialize Probe Structure
+### Step 1: Create Probe Directory in forge/apps/
 
-**Command:** `/init-probe <probe_name>`
+**Command:** `mkdir -p forge/apps/<probe_name>`
 
 **Creates:**
 ```
-probes/<probe_name>/
-├── specs/
-│   └── <probe_name>.yaml      # Template YAML
-├── vhdl/
-│   └── .gitkeep
-├── docs/
-│   └── README.md              # Template
-└── tests/
-    └── .gitkeep
+forge/apps/<probe_name>/
+└── (ready for YAML specification)
 ```
 
-**User Action:** Review created structure
+**Note:** Option A uses `forge/apps/` as the primary workspace. The `probes/` directory is deprecated.
 
 ---
 
 ### Step 2: Write YAML Specification
 
-**User edits:** `probes/<probe_name>/specs/<probe_name>.yaml`
+**User creates:** `forge/apps/<probe_name>/<probe_name>.yaml`
 
 **Template structure:**
 ```yaml
@@ -92,7 +85,7 @@ mapping_strategy: type_clustering  # Recommended
 
 **Delegate to:** forge-context
 
-**Command:** `/validate probes/<probe_name>/specs/<probe_name>.yaml`
+**Command:** `/validate forge/apps/<probe_name>/<probe_name>.yaml`
 
 **What it checks:**
 - YAML syntax valid
