@@ -281,12 +281,13 @@ rm -rf forge/.claude/agents/workflow-coordinator  # renamed to forge-pipe-fitter
 Before considering migration complete:
 
 ### Agent Files
-- [ ] `.claude/agents/deployment-orchestrator/agent.md` exists (~600 lines)
-- [ ] `.claude/agents/hardware-debug/agent.md` exists (~650 lines)
-- [ ] `.claude/agents/probe-design-orchestrator/agent.md` exists (~400-500 lines)
-- [ ] `forge/.claude/agents/forge-pipe-fitter/agent.md` exists (~460 lines)
+- [ ] `.claude/agents/deployment-orchestrator/agent.md` exists (~600 lines) - TO BE MOVED
+- [ ] `.claude/agents/hardware-debug/agent.md` exists (~650 lines) - TO BE MOVED
+- [x] `.claude/agents/probe-design-orchestrator/agent.md` exists (556 lines) - ✅ DONE IN PHASE 3
+- [ ] `forge/.claude/agents/forge-pipe-fitter/agent.md` exists (~460 lines) - TO BE RENAMED
 - [ ] `forge/.claude/agents/forge-context/agent.md` updated (references fixed)
 - [ ] `forge/.claude/agents/docgen-context/agent.md` updated (references fixed)
+- [x] `.claude/agents/probe-design-orchestrator/agent.md` updated (delegation references) - AFTER MIGRATION
 
 ### Cross-References
 - [ ] All agents reference correct peer agents (new names, new locations)
@@ -294,8 +295,13 @@ Before considering migration complete:
 - [ ] monorepo agents reference forge agents correctly (forge/.claude/agents/*)
 
 ### Commands
-- [ ] forge/.claude/commands/*.md updated with new agent references
-- [ ] No broken delegation references
+- [x] `.claude/commands/*.md` (5 files) created - ✅ DONE IN PHASE 3
+- [ ] forge/.claude/commands/*.md updated with new agent references - AFTER MIGRATION
+- [ ] No broken delegation references - VERIFY AFTER MIGRATION
+
+### Shared Docs
+- [x] `.claude/shared/CONTEXT_MANAGEMENT.md` created - ✅ DONE IN PHASE 3
+- [x] `.claude/shared/PROBE_WORKFLOW.md` created - ✅ DONE IN PHASE 3
 
 ### Old Files Removed
 - [ ] `forge/.claude/agents/deployment-context/` deleted
