@@ -120,16 +120,16 @@ Error 2 (line 12): default_value 40000 out of range for voltage_output_05v_s16 (
 
 ### Step 4: Generate Package
 
-**Delegate to:** forge-context or workflow-coordinator
+**Delegate to:** forge-context or forge-pipe-fitter
 
 **Option A - Just generate:**
 ```
-/generate probes/<probe_name>/specs/<probe_name>.yaml
+/generate forge/apps/<probe_name>/<probe_name>.yaml
 ```
 
 **Option B - Full pipeline (recommended):**
 ```
-/workflow new-probe probes/<probe_name>/specs/<probe_name>.yaml
+/workflow new-probe forge/apps/<probe_name>/<probe_name>.yaml
 ```
 
 **What it generates:**
@@ -221,9 +221,9 @@ control_flag <= Control7(31);
 
 ### Step 6: Implement Custom VHDL Logic
 
-**User creates:** `probes/<probe_name>/vhdl/<probe_name>_logic.vhd`
+**User edits:** `forge/apps/<probe_name>/<probe_name>_custom_inst_main.vhd`
 
-**Reference template:** `forge/apps/<probe_name>/<probe_name>_custom_inst_main.vhd`
+**Template generated in Step 4** - shows signal interfaces and structure
 
 **Key principles:**
 

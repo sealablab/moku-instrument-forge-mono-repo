@@ -597,6 +597,89 @@ forge/.claude/
 
 ---
 
+## Post-Phase 4: Option A Testing & Validation
+
+**Date:** 2025-11-03
+**Status:** ✅ TESTED & VALIDATED
+**Decision:** Adopt **Option A** architecture (forge/apps/ as primary workspace)
+
+### Testing Results
+
+**Tested Components:**
+1. ✅ Agent hierarchy (Phase 4 refactoring)
+   - `/probe-status` command working
+   - probe-design-orchestrator delegation successful
+   - All agents properly organized by domain
+
+2. ✅ YAML validation (`forge/apps/DS1140_PD/DS1140_PD.yaml`)
+   - 8 datatypes validated (3 boolean, 2 voltage, 3 timing)
+   - `BasicAppsRegPackage.from_yaml()` SUCCESS
+   - Pydantic validation working correctly
+
+3. ✅ VHDL package generation
+   - 8 signals → 3 control registers (CR6-CR8)
+   - 69.8% packing efficiency (67/96 bits used)
+   - Generated shim (8.0 KB) and main template (6.9 KB)
+   - `forge.generator.codegen.generate_vhdl()` SUCCESS
+
+### Option A Architecture (Final Decision)
+
+**Structure:**
+```
+forge/apps/DS1140_PD/
+├── DS1140_PD.yaml                      # ✅ Source specification
+├── DS1140_PD_custom_inst_shim.vhd     # ✅ Auto-generated
+├── DS1140_PD_custom_inst_main.vhd     # ✅ Template for user
+└── README.md
+```
+
+**Why Option A:**
+1. ✅ Works with forge as-is (no code changes needed)
+2. ✅ Simple mental model: "forge/apps/ is my workspace"
+3. ✅ YAML + generated files in one place
+4. ✅ Validated and tested successfully
+5. ✅ Aligns with forge's actual implementation
+
+**Option B (NOT CHOSEN):**
+- Would separate source (`probes/*/specs/*.yaml`) from generated (`forge/apps/`)
+- Requires forge modifications or wrapper scripts
+- More complex, can revisit later if needed
+
+### probes/ Directory Status
+
+**Decision:** Mark as **DEPRECATED**
+- Current `probes/` directory has partial work artifacts
+- Not used in primary Option A workflow
+- Can be cleaned up or kept for historical reference
+
+**Documentation Updated:**
+- `.claude/agents/probe-design-orchestrator/agent.md` - Shows Option A structure
+- `.claude/shared/PROBE_WORKFLOW.md` - Steps use `forge/apps/` paths
+- `OPTION_A_TEST_SUMMARY.md` - Complete testing summary
+
+### Validation Commands
+
+**YAML Validation:**
+```python
+from forge.models.package import BasicAppsRegPackage
+from pathlib import Path
+pkg = BasicAppsRegPackage.from_yaml(Path('apps/DS1140_PD/DS1140_PD.yaml'))
+print(f'✅ {pkg.app_name}, {len(pkg.datatypes)} signals')
+```
+
+**Package Generation:**
+```python
+from pathlib import Path
+from forge.generator.codegen import generate_vhdl
+generate_vhdl(
+    Path('apps/DS1140_PD/DS1140_PD.yaml'),
+    Path('apps/DS1140_PD'),
+    Path('forge/templates')
+)
+```
+
+---
+
 ## References
 
 **Related Documents:**
