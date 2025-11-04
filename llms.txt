@@ -39,7 +39,11 @@ Authoritative Pydantic model libraries defining core abstractions:
 
 | Component | Purpose | Quick Ref |
 |-----------|---------|-----------|
-| [forge-vhdl](libs/forge-vhdl/) | Shared VHDL components | [llms.txt](libs/forge-vhdl/llms.txt) |
+| [forge-vhdl](libs/forge-vhdl/) | Shared VHDL components + voltage type system | [llms.txt](libs/forge-vhdl/llms.txt) |
+
+**Voltage Type System:** Function-based voltage domain safety (3.3V, 5V, ±5V)
+- Design: [docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md](docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md)
+- Python reference: [docs/migration/voltage_types_reference.py](docs/migration/voltage_types_reference.py)
 
 ### Probe Development (monorepo level)
 
@@ -76,6 +80,12 @@ forge/apps/
 **→ Read:** All foundational library llms.txt files
 **→ Read:** forge/llms.txt
 **→ Agent:** workflow-coordinator
+
+### Voltage Type System Usage
+**Task:** "Use type-safe voltage domains in VHDL/Python"
+**→ Read:** [docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md](docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md)
+**→ Read:** [libs/forge-vhdl/llms.txt](libs/forge-vhdl/llms.txt) (see "Voltage Type System")
+**→ Python ref:** [docs/migration/voltage_types_reference.py](docs/migration/voltage_types_reference.py)
 
 ## Tiered Context Loading Strategy
 
