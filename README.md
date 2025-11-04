@@ -2,9 +2,10 @@
 
 Monorepo for developing Moku custom EMFI probe drivers using the forge framework.
 
-**Status:** Infrastructure complete, ready for probe development
+**Status:** Phase 4 complete, Option A architecture validated ✅
+**Version:** `v0.1.0-phase4` (2025-11-03)
+**Architecture:** Agent-based development workflow with forge/apps/ as workspace
 **Synchronized:** `monorepo-init-v1.0.0` (2025-11-03)
-**Architecture:** Validated in [moku-spike-redux](https://github.com/sealablab/moku-spike-redux)
 
 ---
 
@@ -42,12 +43,18 @@ Provides reusable VHDL components:
 
 ---
 
-## Directory Layout
+## Directory Layout (Option A Architecture)
 
 ```
 moku-instrument-forge-mono-repo/
 │
 ├── forge/                              # Submodule: moku-instrument-forge
+│   ├── apps/                           # Probe packages (YAML + generated VHDL)
+│   │   └── DS1140_PD/                  # Example probe package
+│   │       ├── DS1140_PD.yaml          # Source specification
+│   │       ├── *_shim.vhd              # Auto-generated interface
+│   │       ├── *_main.vhd              # Template for implementation
+│   │       └── README.md               # Documentation
 │   ├── generator/                      # YAML → VHDL code generation
 │   ├── templates/                      # Jinja2 templates
 │   └── libs/
@@ -59,26 +66,33 @@ moku-instrument-forge-mono-repo/
 │   ├── forge-vhdl/                     # Submodule: VHDL utilities
 │   └── platform/common/                # Platform-specific VHDL (future)
 │
-├── probes/
-│   ├── DS1120_PD/                      # DS1120A probe (empty, ready)
-│   │   ├── generated/                  # Forge-generated code
-│   │   ├── vhdl/                       # Custom FSM implementation
-│   │   └── tests/                      # CocotB tests
-│   └── DS1140_PD/                      # DS1140A probe (empty, ready)
-│       ├── generated/
-│       ├── vhdl/
-│       └── tests/
+├── probes/                             # DEPRECATED (see probes/README.md)
+│   └── README.md                       # Migration guide to Option A
 │
 ├── archive/
 │   └── ez-emfi-probes/                 # Reference implementations (read-only)
 │       ├── DS1120_PD/                  # Old DS1120A implementation
 │       └── DS1140_PD/                  # Old DS1140A implementation
 │
+├── .claude/                            # AI agent configurations (Phase 4)
+│   ├── agents/                         # Monorepo-level agents
+│   │   ├── deployment-orchestrator/    # Package → hardware deployment
+│   │   ├── hardware-debug/             # FSM debugging
+│   │   └── probe-design-orchestrator/  # Probe workflow coordination
+│   ├── commands/                       # Slash commands
+│   └── shared/                         # Shared documentation
+│
 ├── tests/                              # Shared test infrastructure
 ├── scripts/                            # Helper scripts
-├── .claude/                            # AI agent configurations
 └── pyproject.toml                      # Python dependencies + pytest config
 ```
+
+**Key Change (Option A):** All probe development happens in `forge/apps/<probe_name>/`:
+- YAML specifications
+- Generated VHDL files
+- User implementation
+
+The `probes/` directory is deprecated (see `probes/README.md` for details).
 
 ---
 
@@ -123,15 +137,55 @@ Each submodule maintains its own documentation:
 
 ## Development Workflow
 
-### Adding a New Probe
+### Adding a New Probe (Option A)
 
-1. Create YAML specification: `forge/apps/NEW_PROBE.yaml`
-2. Generate interface code → `probes/NEW_PROBE/generated/`
-3. Implement custom FSM → `probes/NEW_PROBE/vhdl/`
-4. Write CocotB tests → `probes/NEW_PROBE/tests/`
-5. Run tests: `pytest probes/NEW_PROBE/`
+1. **Initialize probe directory:**
+   ```bash
+   /init-probe NEW_PROBE  # Creates forge/apps/NEW_PROBE/
+   ```
 
-See [forge/README.md](forge/README.md) for detailed code generation workflow.
+2. **Write YAML specification:**
+   - Edit `forge/apps/NEW_PROBE/NEW_PROBE.yaml`
+   - Define datatypes, platform, mapping strategy
+
+3. **Validate YAML:**
+   ```bash
+   /validate forge/apps/NEW_PROBE/NEW_PROBE.yaml
+   ```
+
+4. **Generate VHDL interface:**
+   ```bash
+   /generate forge/apps/NEW_PROBE/NEW_PROBE.yaml
+   ```
+   Creates:
+   - `*_shim.vhd` (auto-generated, DO NOT EDIT)
+   - `*_main.vhd` (template for your implementation)
+
+5. **Implement custom logic:**
+   - Edit `forge/apps/NEW_PROBE/NEW_PROBE_custom_inst_main.vhd`
+   - Use friendly signal names from YAML
+
+6. **Deploy and test:**
+   ```bash
+   /deploy NEW_PROBE --device <ip>
+   /monitor-state NEW_PROBE
+   ```
+
+See [.claude/shared/PROBE_WORKFLOW.md](.claude/shared/PROBE_WORKFLOW.md) for detailed workflow.
+
+### AI Agent Commands
+
+Phase 4 includes AI agents for probe development:
+
+```bash
+/probe-status                          # Show all probe states
+/init-probe <name>                     # Create new probe
+/validate forge/apps/<name>/<name>.yaml  # Validate YAML
+/generate forge/apps/<name>/<name>.yaml  # Generate VHDL
+/deploy <name> --device <ip>           # Deploy to hardware
+```
+
+See [.claude/commands/](.claude/commands/) for all available commands.
 
 ### Updating Submodules
 
@@ -152,11 +206,13 @@ git commit -m "chore: Update forge to <version>"
 ```bash
 pytest              # All tests
 pytest libs/        # Library tests only
-pytest probes/      # Probe tests only
+pytest forge/       # Forge tests
 pytest -n auto      # Parallel execution
 ```
 
 Configuration in `pyproject.toml`.
+
+**Note:** Probe-specific tests would go in `forge/apps/<probe_name>/tests/` (future).
 
 ---
 
@@ -203,7 +259,39 @@ The `archive/` directory contains reference implementations from the EZ-EMFI pro
 
 ## Architecture
 
-Patterns validated in [moku-spike-redux](https://github.com/sealablab/moku-spike-redux):
+### Option A (Current)
+
+**Primary workspace:** `forge/apps/<probe_name>/`
+- YAML specifications
+- Generated VHDL files
+- User implementations
+- Documentation
+
+**Benefits:**
+- Simple mental model: "everything in one place"
+- Works with forge as-is (no modifications needed)
+- Clear separation: source + generated in same directory
+- Validated and tested (see `OPTION_A_TEST_SUMMARY.md`)
+
+### Phase 4 Agent System
+
+Hierarchical AI agent organization for probe development:
+
+**Monorepo-level agents** (`.claude/agents/`):
+- `deployment-orchestrator` - Hardware deployment
+- `hardware-debug` - FSM debugging and monitoring
+- `probe-design-orchestrator` - Workflow coordination
+
+**Forge-level agents** (`forge/.claude/agents/`):
+- `forge-context` - YAML validation and package generation
+- `docgen-context` - Documentation generation
+- `forge-pipe-fitter` - Multi-stage pipeline coordination
+
+See `P4_AGENT_REFACTOR_HANDOFF.md` for complete Phase 4 details.
+
+### Foundation Patterns
+
+From [moku-spike-redux](https://github.com/sealablab/moku-spike-redux):
 
 - Git submodules for dependency management
 - CocotB + pytest for VHDL testing (no Makefiles)
