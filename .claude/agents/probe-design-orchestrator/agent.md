@@ -86,25 +86,25 @@ You: "I'll delegate to forge-context for YAML validation."
 → Use forge-context agent: /validate probes/DS1140_PD/specs/DS1140_PD.yaml
 ```
 
-**Package Generation → Delegate to workflow-coordinator**
+**Package Generation → Delegate to forge-pipe-fitter**
 ```
 User: "Generate package for my probe"
-You: "I'll delegate to workflow-coordinator for the full generation pipeline."
-→ Use workflow-coordinator agent: /workflow new-probe probes/DS1140_PD/specs/DS1140_PD.yaml
+You: "I'll delegate to forge-pipe-fitter for the full generation pipeline."
+→ Use forge-pipe-fitter agent: /workflow new-probe probes/DS1140_PD/specs/DS1140_PD.yaml
 ```
 
-**Deployment → Delegate to deployment-context**
+**Deployment → Delegate to deployment-orchestrator**
 ```
 User: "Deploy my probe to hardware"
-You: "I'll delegate to deployment-context for hardware deployment."
-→ Use deployment-context agent: /deploy DS1140_PD --device 192.168.1.100
+You: "I'll delegate to deployment-orchestrator for hardware deployment."
+→ Use deployment-orchestrator agent: /deploy DS1140_PD --device 192.168.1.100
 ```
 
-**FSM Debugging → Delegate to hardware-debug-context**
+**FSM Debugging → Delegate to hardware-debug**
 ```
 User: "My probe FSM is stuck"
-You: "I'll delegate to hardware-debug-context for FSM analysis."
-→ Use hardware-debug-context agent: /debug-fsm DS1140_PD
+You: "I'll delegate to hardware-debug for FSM analysis."
+→ Use hardware-debug agent: /debug-fsm DS1140_PD
 ```
 
 **Register Optimization → Delegate to forge-context**
@@ -143,7 +143,7 @@ You: "I'll delegate to docgen-context for documentation generation."
 
 ---
 
-### 2. deployment-context (Package → Hardware)
+### 2. deployment-orchestrator (Package → Hardware) [MONOREPO-LEVEL]
 **Commands:**
 - `/deploy <app_name> --device <ip>` - Deploy to Moku device
 - `/discover` - Find Moku devices on network
@@ -153,11 +153,11 @@ You: "I'll delegate to docgen-context for documentation generation."
 - Finding available Moku devices
 - Configuring hardware routing
 
-**Reference:** `forge/.claude/agents/deployment-context/agent.md`
+**Reference:** `../../deployment-orchestrator/agent.md` (monorepo-level agent)
 
 ---
 
-### 3. hardware-debug-context (FSM Debugging)
+### 3. hardware-debug (FSM Debugging) [MONOREPO-LEVEL]
 **Commands:**
 - `/debug-fsm <app_name>` - Debug state machine
 - `/monitor-state <app_name>` - Monitor FSM state
@@ -170,7 +170,7 @@ You: "I'll delegate to docgen-context for documentation generation."
 - Analyzing timing issues
 - Tracing signal values
 
-**Reference:** `forge/.claude/agents/hardware-debug-context/agent.md`
+**Reference:** `../../hardware-debug/agent.md` (monorepo-level agent)
 
 ---
 
@@ -189,7 +189,7 @@ You: "I'll delegate to docgen-context for documentation generation."
 
 ---
 
-### 5. workflow-coordinator (Multi-Stage Pipelines)
+### 5. forge-pipe-fitter (Multi-Stage Forge Pipelines)
 **Commands:**
 - `/workflow new-probe <yaml_file>` - Full pipeline
 - `/workflow iterate <yaml_file>` - Fast iteration
@@ -198,11 +198,11 @@ You: "I'll delegate to docgen-context for documentation generation."
 - `/workflow optimize <yaml_file>` - Compare strategies
 
 **When to use:**
-- Running complete workflows
+- Running complete forge workflows
 - Coordinating multiple forge operations
-- End-to-end probe development
+- End-to-end package generation pipelines
 
-**Reference:** `forge/.claude/agents/workflow-coordinator/agent.md`
+**Reference:** `forge/.claude/agents/forge-pipe-fitter/agent.md`
 
 ---
 
@@ -234,7 +234,7 @@ You: "I'll delegate to docgen-context for documentation generation."
    /validate probes/DS1180_LASER/specs/DS1180_LASER.yaml
    ```
 
-4. **Delegate package generation** → workflow-coordinator
+4. **Delegate package generation** → forge-pipe-fitter
    ```
    /workflow new-probe probes/DS1180_LASER/specs/DS1180_LASER.yaml
    ```
@@ -257,12 +257,12 @@ You: "I'll delegate to docgen-context for documentation generation."
    Check VHDL types match expected types
    ```
 
-7. **Delegate deployment** → deployment-context
+7. **Delegate deployment** → deployment-orchestrator
    ```
    /deploy DS1180_LASER --device 192.168.1.100
    ```
 
-8. **Delegate monitoring** → hardware-debug-context
+8. **Delegate monitoring** → hardware-debug
    ```
    /monitor-state DS1180_LASER
    ```
@@ -282,7 +282,7 @@ You: "I'll delegate to docgen-context for documentation generation."
 
 **Your Coordination:**
 
-1. **Delegate regeneration** → workflow-coordinator
+1. **Delegate regeneration** → forge-pipe-fitter
    ```
    /workflow iterate probes/DS1180_LASER/specs/DS1180_LASER.yaml --deploy
    ```
@@ -587,12 +587,14 @@ Before considering probe development complete:
 - [Probe Workflow](./../shared/PROBE_WORKFLOW.md) - End-to-end guide
 - [Monorepo llms.txt](../../../llms.txt) - Entry point for AI agents
 
+**Monorepo Agents:**
+- [deployment-orchestrator](../../deployment-orchestrator/agent.md) - Package → Hardware (monorepo-level)
+- [hardware-debug](../../hardware-debug/agent.md) - FSM Debugging (monorepo-level)
+
 **Forge Agents:**
 - [forge-context](../../../forge/.claude/agents/forge-context/agent.md) - YAML → Package
-- [deployment-context](../../../forge/.claude/agents/deployment-context/agent.md) - Package → Hardware
-- [hardware-debug-context](../../../forge/.claude/agents/hardware-debug-context/agent.md) - FSM Debugging
 - [docgen-context](../../../forge/.claude/agents/docgen-context/agent.md) - Documentation
-- [workflow-coordinator](../../../forge/.claude/agents/workflow-coordinator/agent.md) - Multi-stage pipelines
+- [forge-pipe-fitter](../../../forge/.claude/agents/forge-pipe-fitter/agent.md) - Multi-stage forge pipelines
 
 **Foundational Libraries:**
 - [MODELS_INDEX](../../../forge/libs/MODELS_INDEX.md) - Library overview
