@@ -90,15 +90,32 @@ moku-instrument-forge-mono-repo/
 
 ### Clone with Submodules
 
+**Note:** This repository uses **nested submodules** - the `forge/` submodule contains three additional submodules (`libs/basic-app-datatypes`, `libs/moku-models`, `libs/riscure-models`). The `--recurse-submodules` flag handles this automatically.
+
 ```bash
 git clone --recurse-submodules https://github.com/sealablab/moku-instrument-forge-mono-repo.git
 cd moku-instrument-forge-mono-repo
 ```
 
-Already cloned? Initialize submodules:
+Already cloned? Initialize all submodules (including nested ones):
 
 ```bash
 git submodule update --init --recursive
+```
+
+Verify all submodules are properly initialized:
+
+```bash
+git submodule status --recursive
+```
+
+Expected output:
+```
+ <commit-hash> forge (tag)
+ <commit-hash> forge/libs/basic-app-datatypes (tag)
+ <commit-hash> forge/libs/moku-models (tag)
+ <commit-hash> forge/libs/riscure-models (tag)
+ <commit-hash> libs/forge-vhdl (tag)
 ```
 
 ### Setup Python Environment
