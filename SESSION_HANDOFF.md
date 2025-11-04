@@ -2,8 +2,8 @@
 
 **Date:** 2025-11-03
 **Session:** Claude Code configuration for hierarchical monorepo
-**Status:** Phase 1, 2 & 3 Complete - Ready for Phase 4 Refactoring
-**Context Used:** ~70k/200k tokens (this session)
+**Status:** Phase 1, 2, 3 & 4 Complete - Agent refactoring done!
+**Context Used:** ~98k/200k tokens (this session)
 
 ---
 
@@ -134,6 +134,78 @@ forge @ d212c2f
 
 ---
 
+### ✅ Phase 4: Agent Architecture Refactoring (Domain-Based Reorganization)
+
+**Goal:** Reorganize agents by domain boundaries (hardware @ monorepo, packages @ forge)
+
+**Completed Work:**
+
+1. **deployment-orchestrator/** - Moved to monorepo level
+   - ✅ Migrated from `forge/.claude/agents/deployment-context/`
+   - ✅ Renamed to deployment-orchestrator (606 lines)
+   - ✅ Updated scope: Deploy ANY package (forge/apps/*, probes/*)
+   - ✅ Enhanced multi-location package discovery
+   - ✅ Version 2.0 - monorepo-wide scope
+   - ✅ Commit: 49abcf2
+
+2. **hardware-debug/** - Moved to monorepo level
+   - ✅ Migrated from `forge/.claude/agents/hardware-debug-context/`
+   - ✅ Updated scope: Debug ANY deployed probe
+   - ✅ Updated references: deployment-context → deployment-orchestrator
+   - ✅ Enhanced cross-package debugging
+   - ✅ Version 2.0 - monorepo-wide scope
+   - ✅ Commit: ac417ae
+
+3. **forge-pipe-fitter/** - Renamed in forge
+   - ✅ Renamed from `workflow-coordinator/`
+   - ✅ Clarified role: Coordinates FORGE pipelines specifically
+   - ✅ Updated delegation: Hardware ops → monorepo agents
+   - ✅ Made domain separation explicit (FORGE vs HARDWARE)
+   - ✅ Version 2.0 - clearer scope
+   - ✅ Templates directory copied
+
+4. **probe-design-orchestrator/** - Updated references
+   - ✅ Updated all delegation references
+   - ✅ deployment-context → deployment-orchestrator
+   - ✅ hardware-debug-context → hardware-debug
+   - ✅ workflow-coordinator → forge-pipe-fitter
+   - ✅ Clarified monorepo vs forge agent locations
+   - ✅ Commit: 50af38f
+
+5. **forge agents updated**
+   - ✅ forge-context: Updated to reference monorepo-level agents
+   - ✅ docgen-context: Updated integration section
+   - ✅ Command files updated (deployment.md, debug.md, workflow.md)
+
+6. **Directory cleanup**
+   - ✅ Deleted old agent directories from forge:
+     - deployment-context/, hardware-debug-context/, workflow-coordinator/
+   - ✅ Deleted old Phase 3 directories from monorepo:
+     - deployment-context/, hardware-debug-context/, probe-design-context/
+   - ✅ Commit: 1fddca2
+
+**Domain Separation Achieved:**
+```
+Monorepo Level (.claude/agents/):
+  - deployment-orchestrator/  (Hardware operations)
+  - hardware-debug/           (Hardware debugging)
+  - probe-design-orchestrator/ (Probe workflow coordination)
+
+Forge Level (forge/.claude/agents/):
+  - forge-context/            (Package generation)
+  - docgen-context/           (Documentation)
+  - forge-pipe-fitter/        (Forge pipeline coordination)
+```
+
+**Benefits:**
+- ✅ Clean domain boundaries (forge = packages, monorepo = hardware)
+- ✅ Clearer agent names (forge-pipe-fitter vs vague workflow-coordinator)
+- ✅ deployment-orchestrator can deploy ANY package (not just forge's)
+- ✅ Reduced confusion about where to find deployment/debug logic
+- ✅ Scalable for future package sources beyond forge
+
+---
+
 ## Phase 3: Agent Structure (IMPLEMENTED)
 
 ### Implemented Structure
@@ -235,9 +307,9 @@ Delegates to: hardware-debug-context (FSM monitoring)
 
 ---
 
-## Phase 4: Agent Architecture Refactoring (PLANNED)
+## Phase 4: Agent Architecture Refactoring (COMPLETE ✅)
 
-**Status:** Documented in `P4_AGENT_REFACTOR_HANDOFF.md`, not yet implemented
+**Status:** Fully implemented! See details above in "Phase 4" section.
 
 ### Key Insight from This Session
 
