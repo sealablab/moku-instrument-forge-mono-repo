@@ -1,48 +1,48 @@
 # moku-instrument-forge-mono-repo
 
-Monorepo for Moku custom EMFI probe drivers using the [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge) framework.
+Monorepo for developing Moku custom EMFI probe drivers using the forge framework.
 
-## Overview
-
-This monorepo provides a structured workspace for developing custom Moku instruments (EMFI probe drivers) by composing git submodules from the Moku forge ecosystem.
-
-**Status:** ⚠️ **Infrastructure ready** - Probe implementations in progress
-**Architecture validated:** [moku-spike-redux](https://github.com/sealablab/moku-spike-redux)
-**Synchronized at:** `monorepo-init-v1.0.0` (2025-11-03)
+**Status:** Infrastructure complete, ready for probe development
+**Synchronized:** `monorepo-init-v1.0.0` (2025-11-03)
+**Architecture:** Validated in [moku-spike-redux](https://github.com/sealablab/moku-spike-redux)
 
 ---
 
-## Repository Composition
+## Monorepo Structure
 
-This monorepo is **hierarchically composed** of the following submodules:
+This repository is composed of git submodules organized in a hierarchical structure:
 
-### 🔧 [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge) → `forge/`
-**Code generation framework** (YAML → VHDL)
+### [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge)
+> **Location:** `forge/`
+> **Purpose:** Code generation framework (YAML → VHDL)
 
-Generates interface code (shim + main template) for custom instruments.
+Generates VHDL interface code (shim + main template) from YAML specifications.
 
-**Nested submodules:**
-- 📦 [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes) → `forge/libs/basic-app-datatypes/`
-  Register package type definitions (Pydantic models)
+#### [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes)
+> **Location:** `forge/libs/basic-app-datatypes/`
+> **Purpose:** Pydantic models for register package types
 
-- 🔌 [moku-models](https://github.com/sealablab/moku-models) → `forge/libs/moku-models/`
-  Moku platform specifications (Go/Lab/Pro/Delta hardware models)
+#### [moku-models](https://github.com/sealablab/moku-models)
+> **Location:** `forge/libs/moku-models/`
+> **Purpose:** Moku platform specifications (Go/Lab/Pro/Delta)
 
-- 🧪 [riscure-models](https://github.com/sealablab/riscure-models) → `forge/libs/riscure-models/`
-  Riscure probe specifications (DS1120A/DS1140A datasheets + models)
+#### [riscure-models](https://github.com/sealablab/riscure-models)
+> **Location:** `forge/libs/riscure-models/`
+> **Purpose:** Riscure probe hardware specifications (DS1120A/DS1140A)
 
-### ⚡ [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl) → `libs/forge-vhdl/`
-**Shared VHDL utilities** (packages, debugging, loaders)
+### [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl)
+> **Location:** `libs/forge-vhdl/`
+> **Purpose:** Shared VHDL utilities and packages
 
-Reusable VHDL components:
-- `vhdl/packages/` - Common types and voltage utilities
-- `vhdl/debugging/` - FSM observer for hardware debugging
-- `vhdl/loader/` - BRAM initialization utilities
-- `vhdl/utilities/` - Clock dividers, triggers, helpers
+Provides reusable VHDL components:
+- **packages/** - Common types, voltage utilities, LUTs
+- **debugging/** - FSM observer for hardware debugging
+- **loader/** - BRAM initialization utilities
+- **utilities/** - Clock dividers, triggers, helpers
 
 ---
 
-## Repository Structure
+## Directory Layout
 
 ```
 moku-instrument-forge-mono-repo/
@@ -50,78 +50,74 @@ moku-instrument-forge-mono-repo/
 ├── forge/                              # Submodule: moku-instrument-forge
 │   ├── generator/                      # YAML → VHDL code generation
 │   ├── templates/                      # Jinja2 templates
-│   └── libs/                           # Nested submodules
-│       ├── basic-app-datatypes/        # Register types
-│       ├── moku-models/                # Platform specs
-│       └── riscure-models/             # Probe specs
+│   └── libs/
+│       ├── basic-app-datatypes/        # Submodule: Register types
+│       ├── moku-models/                # Submodule: Platform specs
+│       └── riscure-models/             # Submodule: Probe specs
 │
 ├── libs/
-│   ├── forge-vhdl/                     # Submodule: moku-instrument-forge-vhdl
-│   │   └── vhdl/{packages,debugging,loader,utilities}/
-│   └── platform/                       # Platform-specific VHDL (future)
-│       └── common/
+│   ├── forge-vhdl/                     # Submodule: VHDL utilities
+│   └── platform/common/                # Platform-specific VHDL (future)
 │
-├── probes/                             # Probe implementations (empty, ready)
-│   ├── DS1120_PD/{generated,vhdl,tests}/
-│   └── DS1140_PD/{generated,vhdl,tests}/
+├── probes/
+│   ├── DS1120_PD/                      # DS1120A probe (empty, ready)
+│   │   ├── generated/                  # Forge-generated code
+│   │   ├── vhdl/                       # Custom FSM implementation
+│   │   └── tests/                      # CocotB tests
+│   └── DS1140_PD/                      # DS1140A probe (empty, ready)
+│       ├── generated/
+│       ├── vhdl/
+│       └── tests/
 │
-├── archive/                            # Reference implementations from EZ-EMFI
-│   └── ez-emfi-probes/                 # See archive/README.md
-│       ├── DS1120_PD/                  # DS1120A reference (volo-based)
-│       └── DS1140_PD/                  # DS1140A reference (volo-based)
+├── archive/
+│   └── ez-emfi-probes/                 # Reference implementations (read-only)
+│       ├── DS1120_PD/                  # Old DS1120A implementation
+│       └── DS1140_PD/                  # Old DS1140A implementation
 │
 ├── tests/                              # Shared test infrastructure
-├── scripts/                            # Helper scripts (forge path setup)
+├── scripts/                            # Helper scripts
 ├── .claude/                            # AI agent configurations
-├── pyproject.toml                      # Python deps + pytest config
-└── README.md                           # This file
+└── pyproject.toml                      # Python dependencies + pytest config
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Clone with Submodules
-
-**⚠️ IMPORTANT:** Clone with `--recurse-submodules` to initialize all nested submodules:
+### Clone with Submodules
 
 ```bash
 git clone --recurse-submodules https://github.com/sealablab/moku-instrument-forge-mono-repo.git
 cd moku-instrument-forge-mono-repo
 ```
 
-If already cloned without submodules:
+Already cloned? Initialize submodules:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-### 2. Setup Python Environment
+### Setup Python Environment
 
 ```bash
 uv sync
 python scripts/setup_forge_path.py  # Verify forge imports
-```
-
-### 3. Verify Installation
-
-```bash
-pytest  # Run tests (currently minimal)
+pytest                               # Run tests
 ```
 
 ---
 
-## Submodule Documentation
+## Documentation
 
-Each submodule has its own README with detailed documentation:
+Each submodule maintains its own documentation:
 
-| Submodule | Purpose | Documentation |
-|-----------|---------|---------------|
-| **[moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge)** | Code generation (YAML → VHDL) | [forge/README.md](forge/README.md) |
-| **[moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl)** | Shared VHDL utilities | [libs/forge-vhdl/README.md](libs/forge-vhdl/README.md) |
-| **[basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes)** | Register types (Pydantic) | [forge/libs/basic-app-datatypes/README.md](forge/libs/basic-app-datatypes/README.md) |
-| **[moku-models](https://github.com/sealablab/moku-models)** | Platform specifications | [forge/libs/moku-models/README.md](forge/libs/moku-models/README.md) |
-| **[riscure-models](https://github.com/sealablab/riscure-models)** | Probe specifications | [forge/libs/riscure-models/README.md](forge/libs/riscure-models/README.md) |
+| Repository | Purpose | Documentation |
+|------------|---------|---------------|
+| [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge) | Code generation (YAML → VHDL) | [forge/README.md](forge/README.md) |
+| [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl) | Shared VHDL utilities | [libs/forge-vhdl/README.md](libs/forge-vhdl/README.md) |
+| [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes) | Register package types | [forge/libs/basic-app-datatypes/README.md](forge/libs/basic-app-datatypes/README.md) |
+| [moku-models](https://github.com/sealablab/moku-models) | Platform specifications | [forge/libs/moku-models/README.md](forge/libs/moku-models/README.md) |
+| [riscure-models](https://github.com/sealablab/riscure-models) | Probe specifications | [forge/libs/riscure-models/README.md](forge/libs/riscure-models/README.md) |
 
 ---
 
@@ -129,117 +125,103 @@ Each submodule has its own README with detailed documentation:
 
 ### Adding a New Probe
 
-1. **Create YAML specification** in `forge/apps/NEW_PROBE.yaml`
-2. **Generate interface code** using forge → `probes/NEW_PROBE/generated/`
-3. **Implement custom FSM** in `probes/NEW_PROBE/vhdl/`
-4. **Write CocotB tests** in `probes/NEW_PROBE/tests/`
-5. **Run tests** with `pytest probes/NEW_PROBE/`
+1. Create YAML specification: `forge/apps/NEW_PROBE.yaml`
+2. Generate interface code → `probes/NEW_PROBE/generated/`
+3. Implement custom FSM → `probes/NEW_PROBE/vhdl/`
+4. Write CocotB tests → `probes/NEW_PROBE/tests/`
+5. Run tests: `pytest probes/NEW_PROBE/`
 
 See [forge/README.md](forge/README.md) for detailed code generation workflow.
 
 ### Updating Submodules
 
 ```bash
-# Update specific submodule
-cd forge  # or libs/forge-vhdl
+# Update a submodule to a specific version
+cd forge
 git fetch origin
-git checkout <commit-hash-or-tag>
-cd ../..
-git add forge  # or libs/forge-vhdl
-git commit -m "chore: Update forge to <version>"
-git push
+git checkout <commit-or-tag>
+cd ..
 
-# Tag synchronized state (optional)
-# See "Submodule Synchronization" section below
+# Commit the update
+git add forge
+git commit -m "chore: Update forge to <version>"
 ```
+
+### Testing
+
+```bash
+pytest              # All tests
+pytest libs/        # Library tests only
+pytest probes/      # Probe tests only
+pytest -n auto      # Parallel execution
+```
+
+Configuration in `pyproject.toml`.
 
 ---
 
 ## Submodule Synchronization
 
-All submodules are tagged at synchronized states for reproducible builds:
+All submodules are tagged at synchronized states for reproducible builds.
 
 **Current sync point:** `monorepo-init-v1.0.0` (2025-11-03)
 
-To checkout a specific sync point:
+### Checkout Synchronized State
 
 ```bash
-# In each submodule
-cd forge
-git checkout monorepo-init-v1.0.0
-cd ../libs/forge-vhdl
-git checkout monorepo-init-v1.0.0
-# ... repeat for nested submodules
-```
-
-Or use git submodule commands:
-
-```bash
+# Checkout all submodules to the synchronized tag
 git submodule foreach --recursive 'git checkout monorepo-init-v1.0.0 || true'
 ```
 
----
+### Create New Sync Point
 
-## Testing
+When updating multiple submodules, tag the new synchronized state:
 
 ```bash
-pytest                  # Run all tests
-pytest libs/            # Library tests only
-pytest probes/          # Probe tests only
-pytest -n auto          # Parallel execution
+# In each updated submodule
+cd forge
+git tag -a monorepo-init-v1.1.0 -m "Synchronized for monorepo v1.1.0"
+git push origin monorepo-init-v1.1.0
+cd ..
+
+# Repeat for other submodules...
 ```
 
-See `pyproject.toml` for pytest configuration.
-
 ---
 
-## Architecture
-
-This monorepo follows patterns validated in [moku-spike-redux](https://github.com/sealablab/moku-spike-redux):
-
-- ✅ **Git submodules** for clean dependency management
-- ✅ **CocotB + pytest** for VHDL testing (no Makefiles)
-- ✅ **Hierarchical composition** for modularity
-- ✅ **Synchronized tagging** for reproducible builds
-
----
-
-## Reference Implementations
+## Archive
 
 The `archive/` directory contains reference implementations from the EZ-EMFI project:
 
 - **DS1120_PD** - DS1120A probe driver (volo-based)
 - **DS1140_PD** - DS1140A probe driver (volo-based)
 
-⚠️ **Status:** Reference only, not actively maintained. See [archive/README.md](archive/README.md).
+**Status:** Reference only, not actively maintained.
+**See:** [archive/README.md](archive/README.md) for details.
+
+---
+
+## Architecture
+
+Patterns validated in [moku-spike-redux](https://github.com/sealablab/moku-spike-redux):
+
+- Git submodules for dependency management
+- CocotB + pytest for VHDL testing (no Makefiles)
+- Hierarchical composition for modularity
+- Synchronized tagging for reproducible builds
 
 ---
 
 ## Contributing
 
-1. Make changes in appropriate submodule or monorepo
+1. Make changes in appropriate submodule
 2. Write CocotB tests for VHDL changes
-3. Run `pytest` to validate
-4. Commit to submodule first, then update monorepo reference
-5. Consider tagging new sync point (e.g., `monorepo-init-v1.1.0`)
+3. Validate with `pytest`
+4. Commit to submodule, then update monorepo reference
+5. Tag new sync point if multiple submodules updated
 
 ---
 
 ## License
 
 MIT License - See [LICENSE](LICENSE)
-
----
-
-## Links
-
-- **Code generation:** [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge)
-- **VHDL utilities:** [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl)
-- **Platform models:** [moku-models](https://github.com/sealablab/moku-models)
-- **Probe models:** [riscure-models](https://github.com/sealablab/riscure-models)
-- **Register types:** [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes)
-- **Architecture validation:** [moku-spike-redux](https://github.com/sealablab/moku-spike-redux)
-
----
-
-**Questions?** Open an issue or see submodule documentation for detailed guides.
