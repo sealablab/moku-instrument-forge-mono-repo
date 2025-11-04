@@ -1,9 +1,10 @@
 # Phase 4: Agent Architecture Refactoring
 
 **Date:** 2025-11-03
-**Status:** Planning - Not yet implemented
-**Prerequisite:** Phase 3 complete (.claude/ directory setup)
+**Status:** Planning - Ready for execution
+**Prerequisite:** ✅ Phase 3 complete (.claude/ directory setup implemented)
 **Context:** Reorganize agents by domain boundaries
+**Note:** This is a work order document - delete after Phase 4 is complete
 
 ---
 
@@ -21,9 +22,15 @@ forge/.claude/agents/
 └── workflow-coordinator/   459 lines - ⚠️  Vague name! Coordinates what?
 ```
 
-**monorepo/.claude/agents/** (Nothing exists yet)
+**monorepo/.claude/agents/** (Phase 3 created minimal structure)
 ```
-(empty - Phase 3 will create this)
+.claude/agents/
+└── probe-design-orchestrator/   556 lines - ✅ CREATED IN PHASE 3
+    └── agent.md                  (Delegates to forge agents, coordinates probes)
+
+Still missing (should be at monorepo level):
+- deployment-orchestrator/ (currently in forge as deployment-context)
+- hardware-debug/ (currently in forge as hardware-debug-context)
 ```
 
 ### Why This Is Wrong
@@ -69,13 +76,14 @@ forge/.claude/agents/
 - **Lines:** ~650 (same content as current hardware-debug-context)
 - **Commands:** `/debug-fsm`, `/monitor-state`, `/trace-signals`, `/analyze-timing`
 
-**3. probe-design-orchestrator/** (new)
+**3. probe-design-orchestrator/** (✅ created in Phase 3)
 - **Domain:** Probe workflow coordination
 - **Input:** User requests for probe development
-- **Delegates to:** forge-context, deployment-orchestrator, hardware-debug, forge-pipe-fitter
+- **Delegates to:** forge-context, deployment-context, hardware-debug-context, workflow-coordinator
 - **Why monorepo:** Bridges probes/* and forge/apps/*, coordinates complete probe lifecycle
-- **Lines:** ~400-500
+- **Lines:** 556 (implemented)
 - **Commands:** Via delegation to specialists
+- **Status:** ✅ Already implemented in Phase 3, currently delegates to forge agents as-is
 
 ---
 
@@ -209,65 +217,24 @@ mkdir -p .claude/agents/probe-design-orchestrator
 - State tracking for forge operations
 - Error handling for generation/validation
 
-### Step 5: Create probe-design-orchestrator (new)
+### Step 5: Update probe-design-orchestrator (already exists)
 
-**Destination:** `.claude/agents/probe-design-orchestrator/agent.md`
+**File:** `.claude/agents/probe-design-orchestrator/agent.md` (✅ created in Phase 3)
 
-**Content:** (~400-500 lines)
-```markdown
-# Probe Design Orchestrator
+**Changes needed:** (~400-500 lines already implemented, needs reference updates)
+**Current implementation (Phase 3):**
+- ✅ 556 lines, fully implemented
+- ✅ Delegates to forge agents (as they currently exist in forge/)
+- ✅ Has rich delegation examples with all current agent names
+- ✅ Includes monorepo-specific workflows
 
-**Domain:** Probe lifecycle coordination (monorepo level)
+**Updates needed after Phase 4 migration:**
+- Update delegation references: deployment-context → deployment-orchestrator
+- Update delegation references: hardware-debug-context → hardware-debug
+- Update delegation references: workflow-coordinator → forge-pipe-fitter
+- Update file path references (agents moved from forge/ to monorepo/)
 
-## Role
-Coordinate between:
-- probes/*/vhdl/ (custom VHDL implementations)
-- probes/*/specs/ (YAML specifications)
-- forge/apps/* (generated packages)
-- Deployed hardware (via deployment-orchestrator)
-
-## Delegates To
-
-### forge-pipe-fitter (forge-level)
-- YAML validation and package generation
-- Documentation generation
-- Register optimization
-
-### deployment-orchestrator (monorepo-level)
-- Deploy packages to Moku devices
-- Device discovery and caching
-
-### hardware-debug (monorepo-level)
-- FSM debugging
-- State monitoring
-- Signal tracing
-
-## Key Workflows
-
-### Workflow: New Probe Development
-1. Initialize probe directory structure (monorepo-specific)
-2. Delegate YAML validation to forge-pipe-fitter
-3. Delegate package generation to forge-pipe-fitter
-4. Guide user through custom VHDL implementation
-5. Cross-validate probe VHDL ↔ generated package (monorepo-specific)
-6. Delegate deployment to deployment-orchestrator
-7. Delegate debugging to hardware-debug
-
-### Workflow: Iterative Development
-[Fast cycles for probe refinement]
-
-### Workflow: Multi-Probe Management
-[Track status across multiple probes]
-
-## Monorepo-Specific Features
-- Probe directory structure validation
-- Cross-validation (probes/* ↔ forge/apps/*)
-- Multi-probe status tracking
-- Submodule sync awareness
-
-## Commands
-(Delegates to specialized agents, doesn't own commands directly)
-```
+**No content changes needed** - just update agent names/paths in delegation examples
 
 ### Step 6: Update forge-context References
 
@@ -475,15 +442,15 @@ result = deployer.deploy(
 │       └── agent.md                (~400-500 lines, new)
 │
 ├── commands/
-│   ├── sync-submodules.md          (~50 lines, new in Phase 3)
-│   ├── init-probe.md               (~80 lines, new in Phase 3)
-│   ├── probe-status.md             (~100 lines, new in Phase 3)
-│   ├── validate-probe-structure.md (~80 lines, new in Phase 3)
-│   └── cross-validate.md           (~100 lines, new in Phase 3)
+│   ├── sync-submodules.md          (✅ 80 lines, created in Phase 3)
+│   ├── init-probe.md               (✅ 180 lines, created in Phase 3)
+│   ├── probe-status.md             (✅ 150 lines, created in Phase 3)
+│   ├── validate-probe-structure.md (✅ 220 lines, created in Phase 3)
+│   └── cross-validate.md           (✅ 420 lines, created in Phase 3)
 │
 └── shared/
-    ├── CONTEXT_MANAGEMENT.md       (~150 lines, new in Phase 3)
-    └── PROBE_WORKFLOW.md           (~200 lines, new in Phase 3)
+    ├── CONTEXT_MANAGEMENT.md       (✅ 430 lines, created in Phase 3)
+    └── PROBE_WORKFLOW.md           (✅ 580 lines, created in Phase 3)
 ```
 
 ### Forge Level
@@ -514,11 +481,28 @@ forge/.claude/
 
 ## Migration Strategy Options
 
+### ~~Option C: Phase 3 First, Then Refactor~~ ✅ COMPLETED
+**Status:** We chose this option, Phase 3 is now complete!
+
+**What was done:**
+1. ✅ Implemented Phase 3 (minimal monorepo .claude/)
+2. ⏭️ Use it for a bit, validate approach (NEXT)
+3. ⏭️ Then execute Phase 4 refactoring with lessons learned (FUTURE)
+
+**Current state:**
+- Phase 3 agents working with current forge structure
+- probe-design-orchestrator delegates to agents as-is (deployment-context, etc.)
+- Ready to use and validate before Phase 4
+
+---
+
+### Recommended Approach for Phase 4 Execution
+
 ### Option A: Big Bang Migration (one session)
 **Approach:** Implement all refactoring in one go
 **Pros:** Clean cut, no intermediate state
 **Cons:** High risk, long session, potential errors
-**Best for:** If very confident in plan
+**Best for:** If very confident in plan after using Phase 3
 
 ### Option B: Incremental Migration (multi-session)
 **Approach:** Migrate one agent at a time, test each
@@ -526,46 +510,40 @@ forge/.claude/
 **Cons:** Temporary inconsistency in naming/locations
 **Best for:** If cautious, want to test each step
 
-### Option C: Phase 3 First, Then Refactor (recommended)
-**Approach:**
-1. Implement Phase 3 as planned (minimal monorepo .claude/)
-2. Use it for a bit, validate approach
-3. Then execute Phase 4 refactoring with lessons learned
-
-**Pros:**
-- Get monorepo .claude/ working first
-- Learn from actual usage before refactoring
-- Two smaller context windows vs one huge one
-
-**Cons:**
-- Temporary suboptimal structure (deployment in forge)
-- Need to update Phase 3 agents after Phase 4
-
-**Recommendation:** Use Option C
+**Recommendation:** Validate Phase 3 first through actual usage, then choose A or B based on experience
 
 ---
 
-## Next Steps (Immediate)
+## Next Steps (Current State)
 
-1. **Complete Phase 3** - Implement minimal monorepo .claude/
-   - Create probe-design-orchestrator (delegates to forge agents as-is)
-   - Create CONTEXT_MANAGEMENT.md and PROBE_WORKFLOW.md
-   - Create monorepo-specific commands
+### ✅ Phase 3 Complete (Done!)
+- ✅ Created probe-design-orchestrator (556 lines, delegates to forge agents)
+- ✅ Created CONTEXT_MANAGEMENT.md and PROBE_WORKFLOW.md
+- ✅ Created 5 monorepo-specific commands
+- ✅ Committed to chore/claude-setup branch (commits: ec3fe00, 9fcf3f3)
 
-2. **Use Phase 3 for actual work** - Validate the approach
-   - Work on a probe using new structure
-   - Identify friction points
-   - Refine based on real usage
+### ⏭️ Before Phase 4 (Recommended)
+1. **Use Phase 3 structure** for actual probe development
+   - Work on a probe using new .claude/ setup
+   - Identify friction points with current agent delegation
+   - Validate that the approach works
+   - Gather learnings before refactoring
 
-3. **Plan Phase 4 session** - Armed with experience
-   - Review this handoff document
-   - Update migration plan based on Phase 3 learnings
-   - Execute refactoring with confidence
+2. **Decide if Phase 4 is needed**
+   - Is current delegation working well?
+   - Are domain boundaries causing confusion?
+   - Is the value worth the refactoring effort?
 
-4. **Consider Phase 5** - If/when needed
-   - Factor deployment library into moku-models
-   - Simplify agent prompts
-   - Make deployment logic reusable
+### ⏭️ When Ready for Phase 4
+1. **Review this document** - Check migration plan is still accurate
+2. **Start fresh session** - Full context window recommended
+3. **Execute migration** - Follow 9-step plan above
+4. **Verify thoroughly** - Use checklist before considering complete
+
+### ⏭️ Phase 5 (Future Enhancement)
+- Factor deployment library into moku-models
+- Simplify agent prompts
+- Make deployment logic reusable across projects
 
 ---
 
