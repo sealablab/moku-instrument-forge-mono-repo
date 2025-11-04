@@ -17,23 +17,19 @@ Create standard probe directory structure with templates.
 /init-probe DS1180_LASER
 ```
 
-## What It Creates
+## What It Creates (Option A)
 
 ```
-probes/<probe_name>/
-├── specs/
-│   └── <probe_name>.yaml      # Template YAML specification
-├── vhdl/
-│   └── .gitkeep               # Placeholder for custom VHDL
-├── docs/
-│   └── README.md              # Template documentation
-└── tests/
-    └── .gitkeep               # Placeholder for test benches
+forge/apps/<probe_name>/
+├── <probe_name>.yaml          # Template YAML specification
+└── README.md                  # Template documentation
 ```
+
+**Note:** VHDL files (*_shim.vhd, *_main.vhd) are generated after running `/generate`.
 
 ## Template YAML
 
-**File:** `probes/<probe_name>/specs/<probe_name>.yaml`
+**File:** `forge/apps/<probe_name>/<probe_name>.yaml`
 
 ```yaml
 app_name: <probe_name>
@@ -68,7 +64,7 @@ mapping_strategy: type_clustering  # Options: first_fit, best_fit, type_clusteri
 
 ## Template README
 
-**File:** `probes/<probe_name>/docs/README.md`
+**File:** `forge/apps/<probe_name>/README.md`
 
 ```markdown
 # <probe_name> Probe
@@ -117,7 +113,7 @@ mapping_strategy: type_clustering  # Options: first_fit, best_fit, type_clusteri
 
 After running `/init-probe`:
 
-1. **Edit YAML spec** (`probes/<probe_name>/specs/<probe_name>.yaml`)
+1. **Edit YAML spec** (`forge/apps/<probe_name>/<probe_name>.yaml`)
    - Update description
    - Add/modify datatypes
    - Choose platform
@@ -125,21 +121,25 @@ After running `/init-probe`:
 
 2. **Validate spec**
    ```
-   /validate probes/<probe_name>/specs/<probe_name>.yaml
+   /validate forge/apps/<probe_name>/<probe_name>.yaml
    ```
 
 3. **Generate package**
    ```
-   /workflow new-probe probes/<probe_name>/specs/<probe_name>.yaml
+   /generate forge/apps/<probe_name>/<probe_name>.yaml
+   ```
+   Or use full workflow:
+   ```
+   /workflow new-probe forge/apps/<probe_name>/<probe_name>.yaml
    ```
 
 4. **Implement custom VHDL**
-   - Create files in `probes/<probe_name>/vhdl/`
-   - Reference `forge/apps/<probe_name>/*_main.vhd` template
+   - Edit `forge/apps/<probe_name>/<probe_name>_custom_inst_main.vhd`
+   - Shim file (*_shim.vhd) is auto-generated, DO NOT EDIT
 
-5. **Cross-validate**
+5. **Deploy and test**
    ```
-   /cross-validate <probe_name>
+   /deploy <probe_name> --device <ip>
    ```
 
 ## Type Reference

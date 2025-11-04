@@ -35,7 +35,7 @@ Ensure custom VHDL uses friendly names, not Control Register direct access.
 
 - Probe structure valid (`/validate-probe-structure`)
 - Package generated (`forge/apps/<probe_name>/` exists)
-- Custom VHDL written (`probes/<probe_name>/vhdl/*.vhd`)
+- Custom VHDL implemented in `forge/apps/<probe_name>/<probe_name>_custom_inst_main.vhd`
 
 ## Example Output - Valid
 
@@ -43,8 +43,8 @@ Ensure custom VHDL uses friendly names, not Control Register direct access.
 ✅ Cross-validation successful
 
 Probe: DS1140_PD
-Package: forge/apps/DS1140_PD/
-VHDL: probes/DS1140_PD/vhdl/
+Location: forge/apps/DS1140_PD/
+VHDL: DS1140_PD_custom_inst_main.vhd
 
 Signal verification:
   ✅ intensity (voltage_output_05v_s16)

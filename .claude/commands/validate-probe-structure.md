@@ -1,6 +1,6 @@
 # Validate Probe Structure
 
-Check that probe directory follows expected structure.
+Check that probe package follows Option A structure.
 
 **Agent:** probe-design-orchestrator
 
@@ -17,27 +17,28 @@ Check that probe directory follows expected structure.
 /validate-probe-structure DS1140_PD
 ```
 
-## What It Checks
+## What It Checks (Option A Architecture)
 
-### Required Directories
-- [ ] `probes/<probe_name>/` exists
-- [ ] `probes/<probe_name>/specs/` exists
-- [ ] `probes/<probe_name>/vhdl/` exists
-- [ ] `probes/<probe_name>/docs/` exists
+### Required Directory
+- [ ] `forge/apps/<probe_name>/` exists
 
 ### Required Files
-- [ ] `probes/<probe_name>/specs/<probe_name>.yaml` exists
-- [ ] `probes/<probe_name>/docs/README.md` exists
+- [ ] `forge/apps/<probe_name>/<probe_name>.yaml` exists
+- [ ] YAML is valid (parseable, correct schema)
 
-### Optional (won't fail validation)
-- `probes/<probe_name>/tests/` - Test benches
-- Additional VHDL files in `vhdl/`
-- Additional docs in `docs/`
+### Generated Files (if package has been generated)
+- [ ] `forge/apps/<probe_name>/<probe_name>_custom_inst_shim.vhd` exists
+- [ ] `forge/apps/<probe_name>/<probe_name>_custom_inst_main.vhd` exists
+- [ ] Generated files are newer than YAML (not stale)
 
-### Package Consistency (if package exists)
-- [ ] `forge/apps/<probe_name>/` exists (if YAML has been generated)
-- [ ] Package `app_name` matches probe name
-- [ ] Platform matches across YAML and manifest.json
+### Optional Files (won't fail validation)
+- `forge/apps/<probe_name>/README.md` - Documentation
+- `forge/apps/<probe_name>/manifest.json` - Package metadata (future)
+
+### Consistency Checks
+- [ ] Package `app_name` in YAML matches directory name
+- [ ] Platform specified is valid (moku_go/lab/pro/delta)
+- [ ] All datatypes reference valid BasicAppDataTypes
 
 ## Example Output - Valid Structure
 
@@ -45,25 +46,24 @@ Check that probe directory follows expected structure.
 ✅ Probe structure validation: PASSED
 
 Probe: DS1140_PD
-Location: probes/DS1140_PD/
-
-Required directories:
-  ✅ specs/ - Found
-  ✅ vhdl/ - Found
-  ✅ docs/ - Found
+Location: forge/apps/DS1140_PD/
 
 Required files:
-  ✅ specs/DS1140_PD.yaml - Found (256 lines)
-  ✅ docs/README.md - Found (42 lines)
+  ✅ DS1140_PD.yaml - Found (65 lines)
+  ✅ YAML valid - 8 datatypes, platform: moku_go
+
+Generated files:
+  ✅ DS1140_PD_custom_inst_shim.vhd - Found (8.0 KB, auto-generated)
+  ✅ DS1140_PD_custom_inst_main.vhd - Found (6.9 KB, template)
+  ✅ Files up-to-date (YAML not modified after generation)
 
 Optional:
-  ✅ tests/ - Found
-  ✅ vhdl/*.vhd - Found (2 files)
+  ✅ README.md - Found
 
-Package consistency:
-  ✅ forge/apps/DS1140_PD/ - Found
-  ✅ app_name matches: DS1140_PD
-  ✅ Platform matches: moku_go
+Consistency checks:
+  ✅ app_name matches directory: DS1140_PD
+  ✅ Platform valid: moku_go
+  ✅ All 8 datatypes valid BasicAppDataTypes
 
 No issues found.
 ```

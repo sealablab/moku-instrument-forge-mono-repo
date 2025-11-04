@@ -12,38 +12,41 @@ Show development status of all probes in the monorepo.
 /probe-status
 ```
 
-No arguments required - scans entire `probes/` directory.
+No arguments required - scans `forge/apps/` directory (Option A architecture).
 
 ## What It Shows
 
 For each probe discovered:
 1. **YAML Status** - Valid, invalid, or missing
-2. **Package Status** - Generated, stale, or missing
+2. **Package Status** - Generated files present
 3. **Deployment Status** - Deployed device IP or not deployed
 
 ## Example Output
 
 ```
-Probe Development Status
-========================
+Probe Development Status (Option A)
+====================================
 
 DS1140_PD
-  ✅ YAML: Valid (probes/DS1140_PD/specs/DS1140_PD.yaml)
-  ✅ Package: Generated (forge/apps/DS1140_PD/, 2025-11-03 14:30)
-  ✅ Deployed: 192.168.1.100 (Slot 2)
+  ✅ YAML: Valid (forge/apps/DS1140_PD/DS1140_PD.yaml)
+  ✅ Package: Generated (2025-11-03 14:30)
+     - DS1140_PD_custom_inst_shim.vhd (8.0 KB)
+     - DS1140_PD_custom_inst_main.vhd (6.9 KB)
+  ✅ Validated: 8 datatypes, 3 registers
+  ❌ Deployed: No
 
 DS1180_LASER
   ⚠️  YAML: Not validated
-  ✅ Package: Generated (forge/apps/DS1180_LASER/, 2025-11-02 10:15)
+  ✅ Package: Generated (2025-11-02 10:15)
   ❌ Deployed: No
 
 DS1200_EM
-  ✅ YAML: Valid (probes/DS1200_EM/specs/DS1200_EM.yaml)
-  ⚠️  Package: Stale (YAML modified after generation)
+  ⚠️  YAML: Stale (modified after generation)
+  ⚠️  Package: Needs regeneration
   ❌ Deployed: No
 
 DS1220_OPTICAL
-  ⚠️  YAML: Validation errors (2 errors found)
+  ❌ YAML: Missing (forge/apps/DS1220_OPTICAL/DS1220_OPTICAL.yaml not found)
   ❌ Package: Not generated
   ❌ Deployed: No
 
@@ -104,12 +107,12 @@ Need attention: 3
 
 ## Checks Performed
 
-1. **Scan probes/ directory** for subdirectories
+1. **Scan forge/apps/ directory** for probe packages
 2. **For each probe:**
-   - Check `probes/<probe_name>/specs/<probe_name>.yaml` exists
+   - Check `forge/apps/<probe_name>/<probe_name>.yaml` exists
    - Read YAML (if exists) and basic syntax check
-   - Check `forge/apps/<probe_name>/` exists
-   - Compare timestamps (YAML vs package)
+   - Check generated VHDL files exist (*_shim.vhd, *_main.vhd)
+   - Compare timestamps (YAML vs generated files)
    - Check deployment cache (if maintained)
 
 ## Use Cases
@@ -130,13 +133,13 @@ New team members can see all available probes.
 
 ### Probe with validation errors
 ```
-/validate probes/<probe_name>/specs/<probe_name>.yaml
+/validate forge/apps/<probe_name>/<probe_name>.yaml
 ```
 Fix errors, re-validate.
 
 ### Probe with stale package
 ```
-/generate probes/<probe_name>/specs/<probe_name>.yaml --force
+/generate forge/apps/<probe_name>/<probe_name>.yaml --force
 ```
 
 ### Probe not deployed
@@ -172,12 +175,12 @@ Output shows:
 
 User: Fix DS1220_OPTICAL first
 
-Agent: /validate probes/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
+Agent: /validate forge/apps/DS1220_OPTICAL/DS1220_OPTICAL.yaml
 [Shows errors]
 
 User: [Fixes YAML]
 
-Agent: /validate probes/DS1220_OPTICAL/specs/DS1220_OPTICAL.yaml
+Agent: /validate forge/apps/DS1220_OPTICAL/DS1220_OPTICAL.yaml
 ✅ Now valid
 
 Agent: /probe-status
