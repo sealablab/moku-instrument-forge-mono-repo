@@ -14,17 +14,18 @@
 ```bash
 # ✅ CORRECT workflow (PER COMPONENT)
 cd libs/forge-vhdl              # Enter submodule
+git checkout 20251104-vhdl-forge-dev  # Ensure on feature branch
 # ... migrate component ...
 git add .
 git commit -m "Migrate volo_clk_divider with CocoTB tests
 
 [Detailed commit message describing what was done]
 "
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 cd ../..                         # Back to monorepo root
 git add libs/forge-vhdl         # Update submodule reference
 git commit -m "chore: Update forge-vhdl submodule (volo_clk_divider migration)"
-git push
+git push origin 20251104-vhdl-forge-dev
 
 # Then repeat for next component
 ```
@@ -133,10 +134,12 @@ For each component, follow this workflow:
 
 ### Step-by-Step Execution
 
-#### Step 1: Navigate to Submodule
+#### Step 1: Navigate to Submodule and Checkout Branch
 ```bash
 cd /Users/johnycsh/TTOP/moku-instrument-forge-mono-repo/libs/forge-vhdl
+git checkout 20251104-vhdl-forge-dev  # Ensure on feature branch
 pwd  # Verify: .../libs/forge-vhdl
+git branch  # Verify: * 20251104-vhdl-forge-dev
 ```
 
 #### Step 2: Copy Test Files from Export
@@ -265,7 +268,7 @@ Related: docs/migration/FORGE_VHDL_P2.md
 EOF
 )"
 
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 ```
 
 #### Step 8: Update Parent Monorepo Reference
@@ -278,7 +281,7 @@ git commit -m "chore: Update forge-vhdl submodule (forge_util_clk_divider migrat
 Migrated volo_clk_divider → forge_util_clk_divider with CocoTB tests.
 See submodule commit for detailed changes.
 "
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 ```
 
 **Component 1 Complete!** ✅
@@ -289,9 +292,10 @@ git push origin main
 
 ### Step-by-Step Execution
 
-#### Step 1: Navigate to Submodule
+#### Step 1: Navigate to Submodule and Checkout Branch
 ```bash
 cd /Users/johnycsh/TTOP/moku-instrument-forge-mono-repo/libs/forge-vhdl
+git checkout 20251104-vhdl-forge-dev  # Ensure on feature branch
 ```
 
 #### Step 2: Copy Test Files from Export
@@ -393,7 +397,7 @@ Related: docs/migration/FORGE_VHDL_P2.md
 EOF
 )"
 
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 ```
 
 #### Step 6: Update Parent Monorepo Reference
@@ -406,7 +410,7 @@ git commit -m "chore: Update forge-vhdl submodule (volo_lut_pkg CocoTB tests)
 Added CocoTB progressive tests for volo_lut_pkg.
 See submodule commit for detailed changes.
 "
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 ```
 
 **Component 2 Complete!** ✅
@@ -758,13 +762,15 @@ Cost per test: $0.001 (GPT-4)
 
 ```bash
 cd libs/forge-vhdl
+git checkout 20251104-vhdl-forge-dev  # Ensure on feature branch
 # make changes
 git add .
 git commit -m "descriptive message"
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 cd ../..
 git add libs/forge-vhdl  # Update parent reference
 git commit -m "chore: Update forge-vhdl submodule"
+git push origin 20251104-vhdl-forge-dev
 ```
 
 ---
@@ -847,13 +853,13 @@ Documentation now follows 3-tier pattern from ARCHITECTURE_OVERVIEW.md.
 
 Related: docs/migration/FORGE_VHDL_P2.md
 "
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 
 # Update parent
 cd ../..
 git add libs/forge-vhdl
 git commit -m "chore: Update forge-vhdl submodule (documentation)"
-git push origin main
+git push origin 20251104-vhdl-forge-dev
 ```
 
 ---
