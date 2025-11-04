@@ -2,8 +2,8 @@
 
 **Date:** 2025-11-03
 **Session:** Claude Code configuration for hierarchical monorepo
-**Status:** Phase 1 & 2 Complete, Phase 3 Ready for Implementation
-**Context Used:** ~114k/200k tokens
+**Status:** Phase 1, 2 & 3 Complete - Ready for Phase 4 Refactoring
+**Context Used:** ~70k/200k tokens (this session)
 
 ---
 
@@ -104,25 +104,58 @@ forge @ d212c2f
 
 ---
 
-## Phase 3: Agent Structure (READY FOR IMPLEMENTATION)
+### ✅ Phase 3: Monorepo .claude/ Directory Setup
 
-### Proposed Minimal Structure
+**Goal:** Create monorepo-level agent structure that coordinates probe development.
 
-**Recommendation:** Thin orchestration layer that delegates to forge agents.
+**Completed Work:**
+
+1. **probe-design-orchestrator/** - Monorepo-level coordinator
+   - ✅ Created `agent.md` (556 lines) - Probe workflow coordination
+   - ✅ Delegates to forge agents (forge-context, deployment-context, etc.)
+   - ✅ Monorepo-specific features (cross-validation, multi-probe management)
+   - ✅ Rich awareness of forge capabilities with delegation examples
+
+2. **Shared knowledge docs/** (2 files)
+   - ✅ `CONTEXT_MANAGEMENT.md` (430 lines) - Tiered loading strategy (Tier 1→2→3)
+   - ✅ `PROBE_WORKFLOW.md` (580 lines) - End-to-end probe development guide
+
+3. **Monorepo-specific commands/** (5 files)
+   - ✅ `sync-submodules.md` (80 lines) - Git submodule management
+   - ✅ `init-probe.md` (180 lines) - Create probe directory structure
+   - ✅ `probe-status.md` (150 lines) - Multi-probe status dashboard
+   - ✅ `validate-probe-structure.md` (220 lines) - Directory structure validation
+   - ✅ `cross-validate.md` (420 lines) - Probe VHDL ↔ package compatibility
+
+**Total:** ~2,600 lines across 8 files
+
+**Commit:** ec3fe00
+**Branch:** chore/claude-setup
+
+---
+
+## Phase 3: Agent Structure (IMPLEMENTED)
+
+### Implemented Structure
+
+**Actual Implementation:**
 
 ```
 .claude/
 ├── agents/
 │   └── probe-design-orchestrator/
-│       └── agent.md                    # NEW - Monorepo-level coordinator (~300 lines)
+│       └── agent.md                    # ✅ 556 lines - Monorepo-level coordinator
 │
 ├── commands/
-│   └── README.md                       # Points to forge/.claude/commands/
+│   ├── sync-submodules.md              # ✅ 80 lines - Git submodule sync
+│   ├── init-probe.md                   # ✅ 180 lines - Create probe structure
+│   ├── probe-status.md                 # ✅ 150 lines - Multi-probe dashboard
+│   ├── validate-probe-structure.md     # ✅ 220 lines - Structure validation
+│   └── cross-validate.md               # ✅ 420 lines - VHDL ↔ package check
 │
 └── shared/
-    ├── CONTEXT_MANAGEMENT.md           # Tiered loading strategy
-    ├── FOUNDATIONAL_MODELS.md          # Deep dive on the trio
-    └── PROBE_WORKFLOW.md               # End-to-end probe development
+    ├── CONTEXT_MANAGEMENT.md           # ✅ 430 lines - Tiered loading strategy
+    └── PROBE_WORKFLOW.md               # ✅ 580 lines - End-to-end workflow guide
 ```
 
 ### Design Rationale
@@ -202,38 +235,70 @@ Delegates to: hardware-debug-context (FSM monitoring)
 
 ---
 
-## Next Steps for New Session
+## Phase 4: Agent Architecture Refactoring (PLANNED)
 
-### Immediate Tasks
+**Status:** Documented in `P4_AGENT_REFACTOR_HANDOFF.md`, not yet implemented
 
-1. **Review Phase 3 proposal** with user
-   - Confirm minimal structure approach
-   - Get approval on agent count (just probe-design-orchestrator?)
-   - Confirm shared docs are valuable
+### Key Insight from This Session
 
-2. **Implement Phase 3** (if approved)
-   - Create `.claude/agents/probe-design-orchestrator/agent.md`
-   - Create `.claude/shared/CONTEXT_MANAGEMENT.md`
-   - Create `.claude/shared/FOUNDATIONAL_MODELS.md`
-   - Create `.claude/shared/PROBE_WORKFLOW.md`
-   - Create `.claude/commands/README.md` (delegation to forge)
+**Problem identified:** Agents are in wrong locations by domain
+- `deployment-context` in forge/ → Should be at monorepo level (hardware ops)
+- `hardware-debug-context` in forge/ → Should be at monorepo level (hardware ops)
+- `workflow-coordinator` in forge/ → Should be renamed `forge-pipe-fitter` (clearer name)
 
-3. **Commit and push**
-   - All Phase 3 files to chore/claude-setup branch
-   - Prepare for PR to main
+### Planned Reorganization
 
-### Questions to Address
+**Monorepo level** (hardware operations):
+- `deployment-orchestrator/` (move from forge, rename from deployment-context)
+- `hardware-debug/` (move from forge)
+- `probe-design-orchestrator/` (already created in Phase 3)
 
-1. **Agent count:** Just probe-design-orchestrator, or monorepo-level wrappers for deployment/debug?
-2. **Shared docs:** All three (CONTEXT_MANAGEMENT, FOUNDATIONAL_MODELS, PROBE_WORKFLOW), or fewer?
-3. **Commands directory:** Actual command files, or just delegation README?
+**Forge level** (package operations):
+- `forge-context/` (keep, this is forge's core domain)
+- `docgen-context/` (keep, generates docs about packages)
+- `forge-pipe-fitter/` (rename from workflow-coordinator, clearer name)
 
-### Future Enhancements (Post-Phase 3)
+**Rationale:** Clean domain separation
+- forge/ = "I generate packages"
+- monorepo/ = "I operate hardware and coordinate probes"
 
-- Add `.claude/skills/` if needed
-- Consider MCP server integration
-- Create example probe workflow documentation
-- Add testing/validation workflows
+### Next Steps
+
+1. **Use Phase 3 structure** for actual probe development
+2. **Validate approach** with real usage
+3. **Execute Phase 4** when ready (new session recommended)
+   - Follow `P4_AGENT_REFACTOR_HANDOFF.md` migration plan
+   - Move agents to correct domain locations
+   - Update all cross-references
+
+### Future Enhancement (Phase 5)
+
+**moku-models library factoring:**
+- Move deployment logic from agent prompt to Python library
+- Create `moku_models.deployment` module (deployer.py, discovery.py, validator.py)
+- Make deployment-orchestrator thin wrapper around library
+- Benefit: Reusable deployment logic outside this monorepo
+
+### Decisions Made This Session
+
+**Agent Structure:**
+- ✅ Minimal approach: Just `probe-design-orchestrator` at monorepo level
+- ✅ Delegates to forge agents (no duplication)
+- ✅ Rich delegation awareness (~400 lines of examples)
+
+**Shared Docs:**
+- ✅ Two docs: CONTEXT_MANAGEMENT, PROBE_WORKFLOW
+- ❌ Skipped FOUNDATIONAL_MODELS (MODELS_INDEX.md already covers this)
+
+**Commands:**
+- ✅ Five monorepo-specific commands created
+- ✅ Focus on unique monorepo concerns (submodules, multi-probe, cross-validation)
+- ✅ No duplication of forge commands (delegate instead)
+
+**Future Refactoring:**
+- ✅ Documented in P4_AGENT_REFACTOR_HANDOFF.md
+- ✅ Clear migration plan for agent reorganization by domain
+- ✅ Phase 5 enhancement path (moku-models library factoring)
 
 ---
 
@@ -271,27 +336,28 @@ Delegates to: hardware-debug-context (FSM monitoring)
 
 ## Files Modified/Created This Session
 
-### Created
-- `forge/libs/basic-app-datatypes/CLAUDE.md` (601 lines)
-- `forge/libs/MODELS_INDEX.md` (324 lines)
-- `llms.txt` (213 lines, monorepo root)
-- `SESSION_HANDOFF.md` (this file)
+### Phase 1 & 2
+- Created `forge/libs/basic-app-datatypes/CLAUDE.md` (601 lines)
+- Created `forge/libs/MODELS_INDEX.md` (324 lines)
+- Created `llms.txt` (213 lines, monorepo root)
+- Modified all lib llms.txt files (refactored to Tier 1 format)
+- Git commits: 9 commits across 4 repos, all pushed ✅
 
-### Modified
-- `forge/libs/basic-app-datatypes/llms.txt` (255→150 lines)
-- `forge/libs/moku-models/llms.txt` (146→172 lines)
-- `forge/libs/moku-models/CLAUDE.md` (+60 lines)
-- `forge/libs/riscure-models/llms.txt` (186→192 lines)
-- `forge/libs/riscure-models/CLAUDE.md` (+65 lines)
+### Phase 3
+- Created `.claude/agents/probe-design-orchestrator/agent.md` (556 lines)
+- Created `.claude/shared/CONTEXT_MANAGEMENT.md` (430 lines)
+- Created `.claude/shared/PROBE_WORKFLOW.md` (580 lines)
+- Created `.claude/commands/sync-submodules.md` (80 lines)
+- Created `.claude/commands/init-probe.md` (180 lines)
+- Created `.claude/commands/probe-status.md` (150 lines)
+- Created `.claude/commands/validate-probe-structure.md` (220 lines)
+- Created `.claude/commands/cross-validate.md` (420 lines)
+- Created `P4_AGENT_REFACTOR_HANDOFF.md` (planning doc)
+- Git commit: ec3fe00 (chore/claude-setup branch)
+- **Not yet pushed** (pending review)
 
-### Git Commits
-- basic-app-datatypes: 2 commits (b784ce3, 15d9fab)
-- moku-models: 2 commits (c24713b, a4267b0)
-- riscure-models: 2 commits (fc475ca, 600375b)
-- forge: 1 commit (d212c2f)
-- monorepo: 1 commit (009600f)
-
-All commits pushed to origin ✅
+### Updated
+- `SESSION_HANDOFF.md` (this file, updated with Phase 3 completion)
 
 ---
 
