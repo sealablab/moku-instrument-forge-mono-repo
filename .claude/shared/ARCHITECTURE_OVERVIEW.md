@@ -42,7 +42,10 @@ moku-instrument-forge-mono-repo/              # Level 0: Monorepo orchestrator
 └── libs/
     └── forge-vhdl/                            # Level 1: Shared VHDL utilities (submodule)
         ├── llms.txt                           # Tier 1: Component catalog
-        └── vhdl/                              # VHDL packages, utilities
+        ├── vhdl/                              # VHDL packages, utilities
+        └── Voltage Type System (Phase 4)      # Function-based voltage domain safety
+            # Design: docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md
+            # Python: docs/migration/voltage_types_reference.py
 ```
 
 ---
