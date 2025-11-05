@@ -8,116 +8,98 @@ Monorepo orchestrating composable git submodules for the complete probe developm
 
 **Key insight:** Tiered documentation with submodule delegation enables focused context loading.
 
+**Architecture:** v2.0.0 - Clean separation between tools and foundational libraries (flat structure)
+
 ## Repository Structure
 
-### Foundational Libraries (git submodules in forge/libs/)
+### Development Tools (git submodules)
+
+| Tool | Purpose | Quick Ref |
+|------|---------|-----------|
+| [forge-codegen](tools/forge-codegen/) | YAML → VHDL code generator with type-safe register serialization | [llms.txt](tools/forge-codegen/llms.txt) |
+
+**Internal to forge-codegen:**
+- `basic_serialized_datatypes/` - 23-type system (voltage/time/boolean) with automatic register packing
+- Not a separate library, tightly coupled serialization internals
+
+### Foundational Libraries (git submodules - flat structure)
 
 Authoritative Pydantic model libraries defining core abstractions:
 
 | Library | Purpose | Quick Ref |
 |---------|---------|-----------|
-| [basic-app-datatypes](forge/libs/basic-app-datatypes/) | Type system (23 voltage/time/boolean types) | [llms.txt](forge/libs/basic-app-datatypes/llms.txt) |
-| [moku-models](forge/libs/moku-models/) | Platform specifications (Go/Lab/Pro/Delta) | [llms.txt](forge/libs/moku-models/llms.txt) |
-| [riscure-models](forge/libs/riscure-models/) | Probe hardware specs (DS1120A, voltage safety) | [llms.txt](forge/libs/riscure-models/llms.txt) |
+| [forge-vhdl](libs/forge-vhdl/) | Reusable VHDL components + voltage type system | [llms.txt](libs/forge-vhdl/llms.txt) |
+| [moku-models](libs/moku-models/) | Platform specifications (Go/Lab/Pro/Delta) | [llms.txt](libs/moku-models/llms.txt) |
+| [riscure-models](libs/riscure-models/) | Probe hardware specs (DS1120A, voltage safety) | [llms.txt](libs/riscure-models/llms.txt) |
 
-**Meta-doc:** See [forge/libs/MODELS_INDEX.md](forge/libs/MODELS_INDEX.md) for integration patterns
+**Design Philosophy:**
+- forge-vhdl: Practical VHDL utilities (3 voltage domains: 3.3V, 5V, ±5V)
+- forge-codegen: Comprehensive code generation (23 types, auto register packing)
+- Clean separation of concerns
 
-### Code Generation Framework (git submodule)
-
-| Component | Purpose | Quick Ref |
-|-----------|---------|-----------|
-| [forge](forge/) | YAML → VHDL generation pipeline | [llms.txt](forge/llms.txt) |
-
-**Agents:** See [forge/.claude/agents/](forge/.claude/agents/) for specialized contexts:
-- forge-context (YAML validation → package generation)
-- deployment-context (package → hardware)
-- hardware-debug-context (FSM debugging)
-- docgen-context (docs, TUIs, Python APIs)
-- workflow-coordinator (multi-stage pipelines)
-
-### VHDL Utilities (git submodule)
-
-| Component | Purpose | Quick Ref |
-|-----------|---------|-----------|
-| [forge-vhdl](libs/forge-vhdl/) | Shared VHDL components + voltage type system | [llms.txt](libs/forge-vhdl/llms.txt) |
-
-**Voltage Type System:** Function-based voltage domain safety (3.3V, 5V, ±5V)
+**Voltage Type System:** Function-based voltage domain safety
 - Design: [docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md](docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md)
 - Python reference: [docs/migration/voltage_types_reference.py](docs/migration/voltage_types_reference.py)
-
-### Probe Development (monorepo level)
-
-Active probe implementations are located in the forge submodule under `forge/apps/`:
-
-```
-forge/apps/
-├── DS1140_PD/    # Example: DS1140A probe package (YAML, generated VHDL, implementation)
-└── [other probes...]
-```
 
 ## Common Workflows
 
 ### Type System Lookup
 **Task:** "What voltage types are available?"
-**→ Read:** [forge/libs/basic-app-datatypes/llms.txt](forge/libs/basic-app-datatypes/llms.txt)
+**→ Read:** [tools/forge-codegen/llms.txt](tools/forge-codegen/llms.txt) (section: "Basic Usage" → Type System)
 
 ### Platform Specs Lookup
 **Task:** "What's Moku:Go clock frequency?"
-**→ Read:** [forge/libs/moku-models/llms.txt](forge/libs/moku-models/llms.txt)
+**→ Read:** [libs/moku-models/llms.txt](libs/moku-models/llms.txt)
 
 ### Code Generation
 **Task:** "Generate VHDL from YAML spec"
-**→ Read:** [forge/llms.txt](forge/llms.txt)
-**→ Agent:** forge-context
+**→ Read:** [tools/forge-codegen/llms.txt](tools/forge-codegen/llms.txt)
+**→ Entry point:** `python -m forge_codegen.generator.codegen spec.yaml`
 
-### Hardware Deployment
-**Task:** "Deploy to Moku device"
-**→ Read:** [forge/llms.txt](forge/llms.txt)
-**→ Agent:** deployment-context
+### VHDL Component Usage
+**Task:** "Use clock divider or voltage packages"
+**→ Read:** [libs/forge-vhdl/llms.txt](libs/forge-vhdl/llms.txt)
 
-### Probe Development
-**Task:** "Implement new probe driver"
-**→ Read:** All foundational library llms.txt files
-**→ Read:** forge/llms.txt
-**→ Agent:** workflow-coordinator
+### Platform Validation
+**Task:** "Validate deployment config"
+**→ Read:** [libs/moku-models/llms.txt](libs/moku-models/llms.txt)
 
-### Voltage Type System Usage
-**Task:** "Use type-safe voltage domains in VHDL/Python"
-**→ Read:** [docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md](docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md)
-**→ Read:** [libs/forge-vhdl/llms.txt](libs/forge-vhdl/llms.txt) (see "Voltage Type System")
-**→ Python ref:** [docs/migration/voltage_types_reference.py](docs/migration/voltage_types_reference.py)
+### Voltage Safety Checking
+**Task:** "Validate probe wiring compatibility"
+**→ Read:** [libs/moku-models/llms.txt](libs/moku-models/llms.txt) + [libs/riscure-models/llms.txt](libs/riscure-models/llms.txt)
 
 ## Tiered Context Loading Strategy
 
 ### Tier 1: Quick Reference (Always load first)
-**Files:** All llms.txt files (~150 lines each)
+**Files:** All llms.txt files (~150-200 lines each)
 **Purpose:** Essential facts, API surface, common tasks
-**When:** Every interaction - minimal token cost
+**When:** Every interaction - minimal token cost (~500-1000 tokens each)
 
 **Load these first:**
-- forge/libs/basic-app-datatypes/llms.txt
-- forge/libs/moku-models/llms.txt
-- forge/libs/riscure-models/llms.txt
-- forge/llms.txt
+- tools/forge-codegen/llms.txt
 - libs/forge-vhdl/llms.txt
+- libs/moku-models/llms.txt
+- libs/riscure-models/llms.txt
 
 ### Tier 2: Deep Context (Load when designing/integrating)
-**Files:** CLAUDE.md files (~250-600 lines)
+**Files:** CLAUDE.md files (~3-5k tokens each)
 **Purpose:** Design rationale, integration patterns, development workflows
 **When:** Designing new features, understanding architecture
 
 **Load when needed:**
-- forge/libs/basic-app-datatypes/CLAUDE.md (adding types)
-- forge/libs/moku-models/CLAUDE.md (platform integration)
-- forge/libs/riscure-models/CLAUDE.md (probe specifications)
+- tools/forge-codegen/CLAUDE.md (code generation internals)
+- libs/forge-vhdl/CLAUDE.md (VHDL design patterns, testing standards)
+- libs/moku-models/CLAUDE.md (platform integration)
+- libs/riscure-models/CLAUDE.md (probe specifications)
 
 ### Tier 3: Implementation (Load when modifying code)
-**Files:** Agent prompts, source code, tests
+**Files:** Agent prompts, source code, tests, specialized docs
 **Purpose:** Detailed implementation logic
 **When:** Actually writing/modifying code
 
 **Load selectively:**
-- forge/.claude/agents/*/agent.md (agent-specific workflows)
+- .claude/agents/*/agent.md (monorepo orchestration agents)
+- tools/forge-codegen/docs/ (detailed guides, references)
 - Source files in specific submodules
 - Test files for validation
 
@@ -127,48 +109,52 @@ forge/apps/
 
 **Question type** → **Load strategy**
 
-"What types exist?" → Tier 1: basic-app-datatypes/llms.txt
+"What types exist?" → Tier 1: tools/forge-codegen/llms.txt
 
-"How do I add a new type?" → Tier 2: basic-app-datatypes/CLAUDE.md
+"How do I add a new type?" → Tier 2: tools/forge-codegen/CLAUDE.md
 
-"Generate VHDL from YAML" → Tier 1: forge/llms.txt → Agent: forge-context
+"Generate VHDL from YAML" → Tier 1: tools/forge-codegen/llms.txt
 
-"Deploy to hardware" → Tier 1: forge/llms.txt → Agent: deployment-context
+"Use VHDL components" → Tier 1: libs/forge-vhdl/llms.txt
 
-"Validate probe wiring" → Tier 1: moku-models + riscure-models llms.txt
+"Platform compatibility?" → Tier 1: libs/moku-models/llms.txt
+
+"Probe voltage safety?" → Tier 1: libs/moku-models/llms.txt + libs/riscure-models/llms.txt
 
 ### Authoritative Sources
 
 **Always trust these libraries:**
-- Type definitions → basic-app-datatypes (23 types, no guessing!)
-- Platform specs → moku-models (Go/Lab/Pro/Delta hardware specs)
-- Probe specs → riscure-models (DS1120A voltage ranges)
+- Type definitions → tools/forge-codegen (23 types internally, no guessing!)
+- Platform specs → libs/moku-models (Go/Lab/Pro/Delta hardware specs)
+- Probe specs → libs/riscure-models (DS1120A voltage ranges)
+- VHDL utilities → libs/forge-vhdl (3 voltage domains, CocoTB tested)
 
 **Never:**
 - Infer types that don't exist
 - Guess platform clock frequencies
 - Assume voltage compatibility without validation
+- Use enums for FSM states (Verilog incompatible!)
 
 ### Agent Delegation
 
-**Monorepo-level coordination:**
-- Use workflow-coordinator for multi-stage pipelines
-- Delegate to forge agents for specialized tasks
-- Don't duplicate forge agent logic
+**Monorepo-level coordination (.claude/):**
+- deployment-orchestrator - Hardware deployment workflows
+- hardware-debug - FSM debugging expertise
+- probe-design-orchestrator - Multi-stage workflows
 
-**Forge agents handle:**
-- Code generation (forge-context)
-- Deployment (deployment-context)
-- Debugging (hardware-debug-context)
-- Documentation (docgen-context)
+**Delegation principle:**
+- Monorepo agents coordinate
+- Submodule work happens within submodules
+- Clear boundaries, no duplication
 
 ## Key Design Principles
 
-1. **Composability** - Submodules are standalone, monorepo orchestrates
+1. **Clean Separation (v2.0)** - tools/ vs libs/ (no nested submodules)
 2. **Tiered docs** - llms.txt (quick ref) → CLAUDE.md (deep dive) → source
-3. **Agent delegation** - Monorepo coordinates, submodule agents execute
-4. **Single source of truth** - Foundational libs are authoritative
+3. **Agent delegation** - Monorepo coordinates, submodules execute
+4. **Single source of truth** - Each submodule is authoritative for its domain
 5. **Context efficiency** - Load minimally, expand as needed
+6. **Type safety throughout** - Pydantic validation, voltage domain safety
 
 ## Development Notes
 
@@ -179,46 +165,50 @@ forge/apps/
 git submodule update --init --recursive
 
 # Update specific submodule
-cd forge/libs/basic-app-datatypes
+cd libs/moku-models
 git pull origin main
-cd ../../..
-git add forge/libs/basic-app-datatypes
-git commit -m "Update basic-app-datatypes submodule"
+cd ../..
+git add libs/moku-models
+git commit -m "Update moku-models submodule"
 
 # Push both submodule and parent
 git push
 ```
 
-### Probe Development Workflow
+### Quick Start
 
-1. Initialize probe structure: `/init-probe PROBE_NAME`
-2. Create YAML spec in `forge/apps/PROBE_NAME/PROBE_NAME.yaml`
-3. Generate VHDL package: `/generate forge/apps/PROBE_NAME/PROBE_NAME.yaml`
-4. Implement custom VHDL in `forge/apps/PROBE_NAME/PROBE_NAME_custom_inst_main.vhd`
-5. Deploy to hardware: `/deploy PROBE_NAME --device <ip>`
-6. Debug with FSM monitoring: `/monitor-state PROBE_NAME`
+```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/sealablab/moku-instrument-forge-mono-repo.git
+
+# Setup Python environment
+uv sync
+
+# Run tests
+pytest
+```
 
 ## Quick Links
 
 ### Documentation
-- **Foundational trio:** [forge/libs/MODELS_INDEX.md](forge/libs/MODELS_INDEX.md)
-- **forge framework:** [forge/README.md](forge/README.md)
-- **VHDL utilities:** [libs/forge-vhdl/README.md](libs/forge-vhdl/README.md)
+- **Architecture overview:** [.claude/shared/ARCHITECTURE_OVERVIEW.md](.claude/shared/ARCHITECTURE_OVERVIEW.md) (v2.0)
+- **Migration history:** [ARCHITECTURE_V2_COMPLETE.md](ARCHITECTURE_V2_COMPLETE.md)
+- **Workflow guide:** [WORKFLOW_GUIDE.md](WORKFLOW_GUIDE.md)
+- **Voltage type system:** [docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md](docs/migration/VOLTAGE_TYPE_SYSTEM_DESIGN.md)
 
 ### Agents
-- **forge agents:** [forge/.claude/agents/](forge/.claude/agents/)
-- **Monorepo agents:** [.claude/agents/](.claude/agents/) (future)
+- **Monorepo agents:** [.claude/agents/](.claude/agents/) (deployment, hardware-debug, probe-design)
 
 ### Submodule Context
-- **basic-app-datatypes:** [llms.txt](forge/libs/basic-app-datatypes/llms.txt) | [CLAUDE.md](forge/libs/basic-app-datatypes/CLAUDE.md)
-- **moku-models:** [llms.txt](forge/libs/moku-models/llms.txt) | [CLAUDE.md](forge/libs/moku-models/CLAUDE.md)
-- **riscure-models:** [llms.txt](forge/libs/riscure-models/llms.txt) | [CLAUDE.md](forge/libs/riscure-models/CLAUDE.md)
-- **forge:** [llms.txt](forge/llms.txt)
-- **forge-vhdl:** [llms.txt](libs/forge-vhdl/llms.txt)
+- **forge-codegen:** [llms.txt](tools/forge-codegen/llms.txt) | [CLAUDE.md](tools/forge-codegen/CLAUDE.md)
+- **forge-vhdl:** [llms.txt](libs/forge-vhdl/llms.txt) | [CLAUDE.md](libs/forge-vhdl/CLAUDE.md)
+- **moku-models:** [llms.txt](libs/moku-models/llms.txt) | [CLAUDE.md](libs/moku-models/CLAUDE.md)
+- **riscure-models:** [llms.txt](libs/riscure-models/llms.txt) | [CLAUDE.md](libs/riscure-models/CLAUDE.md)
 
 ---
 
-**Version:** Current
-**Last Updated:** 2025-11-03
+**Version:** v2.0.0
+**Last Updated:** 2025-11-04
+**Architecture:** Clean separation (tools + flat libs)
 **Main Branch:** main
 **License:** MIT

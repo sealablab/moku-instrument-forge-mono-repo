@@ -30,14 +30,13 @@ This monorepo uses a **three-tier context loading strategy** to optimize token u
 **Load these first:**
 1. **Monorepo `llms.txt`** (213 lines)
    - Repository structure overview
-   - Delegation strategy (monorepo → forge → libs)
+   - Delegation strategy (monorepo → tools → libs)
    - Common workflows summary
    - Git submodule navigation
 
 2. **Agent prompt** (specific to task)
-   - probe-design-orchestrator (if monorepo-level task)
-   - forge-context (if YAML/package task)
-   - deployment-context (if hardware task)
+   - deployment-orchestrator (if hardware deployment task)
+   - hardware-debug (if debugging task)
    - etc.
 
 **What you get:**
@@ -49,13 +48,13 @@ This monorepo uses a **three-tier context loading strategy** to optimize token u
 **Example - Starting work:**
 ```
 AI Agent loads:
-1. llms.txt (213 lines) → "This is a monorepo with forge/ and libs/ submodules"
-2. probe-design-orchestrator/agent.md → "I coordinate probe development, delegate to forge agents"
+1. llms.txt (213 lines) → "This is a monorepo with tools/ and libs/ submodules"
+2. deployment-orchestrator/agent.md → "I coordinate hardware deployment workflows"
 
 AI Agent knows:
-- Repository structure
+- Repository structure (v2.0 flat architecture)
 - What agents are available
-- Where to find type definitions (libs/basic-app-datatypes)
+- Where to find type definitions (tools/forge-codegen/basic_serialized_datatypes)
 - How to delegate tasks
 ```
 
@@ -66,27 +65,26 @@ AI Agent knows:
 **Purpose:** Deep context for specific domains, cross-library integration
 
 **Load these when:**
-- Designing new probes (need type system details)
-- Validating YAML (need schema details)
+- Designing new code generation (need type system details)
+- Understanding VHDL components (need architecture patterns)
 - Debugging integration issues (need cross-library patterns)
-- Understanding forge pipelines (need multi-stage workflows)
+- Working with platform specifications (need hardware details)
 
 **Tier 2 Documents:**
 
-1. **CLAUDE.md files** (foundational libraries)
-   - `basic-app-datatypes/CLAUDE.md` (601 lines) - Type system deep dive
-   - `moku-models/CLAUDE.md` (~300 lines) - Platform integration patterns
-   - `riscure-models/CLAUDE.md` (~300 lines) - Probe safety patterns
+1. **CLAUDE.md files** (submodules)
+   - `tools/forge-codegen/CLAUDE.md` - Type system and code generation deep dive
+   - `libs/forge-vhdl/CLAUDE.md` - VHDL components and testing patterns
+   - `libs/moku-models/CLAUDE.md` - Platform integration patterns
+   - `libs/riscure-models/CLAUDE.md` - Probe safety patterns
 
 2. **Shared knowledge docs**
-   - `CONTEXT_MANAGEMENT.md` (this file, 150 lines) - Meta-strategy
-   - `PROBE_WORKFLOW.md` (200 lines) - End-to-end workflows
-   - `forge/libs/MODELS_INDEX.md` (324 lines) - Library meta-doc
+   - `CONTEXT_MANAGEMENT.md` (this file) - Meta-strategy
+   - `ARCHITECTURE_OVERVIEW.md` - v2.0 architecture details
 
 3. **Agent prompts** (when delegating)
-   - forge-context (750 lines) - YAML → package generation
-   - deployment-context (557 lines) - Package → hardware
-   - workflow-coordinator (459 lines) - Multi-stage orchestration
+   - deployment-orchestrator - Hardware deployment workflows
+   - hardware-debug - FSM debugging and monitoring
 
 **What you get:**
 - Design rationale (why these types? why this architecture?)
@@ -94,21 +92,21 @@ AI Agent knows:
 - Complete workflows (step-by-step guides)
 - Common pitfalls and solutions
 
-**Example - Designing new probe:**
+**Example - Designing new instrument:**
 ```
 AI Agent already loaded Tier 1.
 
-User: "I want to create a probe with voltage and timing controls"
+User: "I want to create an instrument with voltage and timing controls"
 
 AI Agent loads Tier 2:
-1. basic-app-datatypes/CLAUDE.md → "25 types available, voltage types explained, conversion formulas"
-2. moku-models/CLAUDE.md → "Voltage ranges by platform, safety constraints"
-3. PROBE_WORKFLOW.md → "End-to-end probe development guide"
+1. tools/forge-codegen/CLAUDE.md → "23 types available, voltage types explained, conversion formulas"
+2. libs/moku-models/CLAUDE.md → "Voltage ranges by platform, safety constraints"
+3. ARCHITECTURE_OVERVIEW.md → "v2.0 clean architecture patterns"
 
 AI Agent now has:
 - Type system details (which voltage type to use?)
 - Platform constraints (will this work on moku_go?)
-- Complete workflow (YAML → package → deploy)
+- Architecture patterns (how submodules integrate)
 ```
 
 ---
@@ -126,17 +124,18 @@ AI Agent now has:
 **Tier 3 Sources:**
 
 1. **Source code files**
-   - `forge/models/package.py` - Pydantic models
-   - `forge/generator/codegen.py` - VHDL generation
-   - `basic_app_datatypes/types.py` - Type definitions
-   - Custom VHDL files (forge/apps/*/*_main.vhd)
+   - `tools/forge-codegen/forge_codegen/models/package.py` - Pydantic models
+   - `tools/forge-codegen/forge_codegen/generator/codegen.py` - VHDL generation
+   - `tools/forge-codegen/forge_codegen/basic_serialized_datatypes/types.py` - Type definitions
+   - `libs/forge-vhdl/vhdl/**/*.vhd` - VHDL components
 
 2. **Template files**
-   - `forge/templates/shim.vhd.j2` - Shim layer template
-   - `forge/templates/main.vhd.j2` - Main template
+   - `tools/forge-codegen/forge_codegen/templates/shim.vhd.j2` - Shim layer template
+   - `tools/forge-codegen/forge_codegen/templates/main.vhd.j2` - Main template
 
 3. **Test files** (when debugging)
-   - `forge/tests/test_*.py` - Test suite
+   - `tools/forge-codegen/tests/test_*.py` - Code generation tests
+   - `libs/forge-vhdl/tests/test_*.py` - VHDL component tests
 
 **What you get:**
 - Actual implementation code
@@ -151,9 +150,9 @@ AI Agent already loaded Tier 1 & 2.
 User: "The generated shim file has wrong bit slices"
 
 AI Agent loads Tier 3:
-1. forge/generator/codegen.py → "How bit slices are calculated"
-2. forge/templates/shim.vhd.j2 → "Template logic for bit extraction"
-3. forge/apps/DS1140_PD/*_shim.vhd → "Actual generated output to inspect"
+1. tools/forge-codegen/forge_codegen/generator/codegen.py → "How bit slices are calculated"
+2. tools/forge-codegen/forge_codegen/templates/shim.vhd.j2 → "Template logic for bit extraction"
+3. Generated output file → "Actual generated output to inspect"
 
 AI Agent can now:
 - Trace bit slice calculation
@@ -209,10 +208,10 @@ Does this involve implementation/debugging?
 
 **Implementation Questions (Tier 1 + 2 + 3):**
 - "Why is my VHDL shim generating wrong bit slices?"
-  - Tier 1: probe-design-orchestrator → "Delegate to forge-context"
-  - Tier 2: forge-context agent → "VHDL generation pipeline explained"
-  - Tier 3: forge/generator/codegen.py → "Actual bit slice calculation code"
-  - Tier 3: forge/templates/shim.vhd.j2 → "Template to inspect"
+  - Tier 1: llms.txt → "Check forge-codegen documentation"
+  - Tier 2: tools/forge-codegen/CLAUDE.md → "VHDL generation pipeline explained"
+  - Tier 3: tools/forge-codegen/forge_codegen/generator/codegen.py → "Actual bit slice calculation code"
+  - Tier 3: tools/forge-codegen/forge_codegen/templates/shim.vhd.j2 → "Template to inspect"
 
 ---
 
@@ -237,8 +236,8 @@ Tier 2:
 Total so far: 7k tokens (3.5% of budget)
 
 Tier 3 (if needed):
-  - forge/generator/codegen.py: +5k
-  - forge/templates/shim.vhd.j2: +2k
+  - tools/forge-codegen/forge_codegen/generator/codegen.py: +5k
+  - tools/forge-codegen/forge_codegen/templates/shim.vhd.j2: +2k
 Total: 14k tokens (7% of budget)
 
 Still have 186k tokens available (93%)
@@ -348,13 +347,13 @@ Result: 0 additional tokens
 ### ❌ Loading Source Code for Questions
 ```
 User: "What's the YAML schema for datatypes?"
-AI Agent: Loads forge/models/package.py (5k tokens)
+AI Agent: Loads tools/forge-codegen/forge_codegen/models/package.py (5k tokens)
 ```
 
 **Instead:**
 ```
-AI Agent: "Check Tier 2: forge-context agent has schema documentation."
-Result: 3k tokens (agent prompt) vs 5k (source code)
+AI Agent: "Check Tier 2: tools/forge-codegen/CLAUDE.md has schema documentation."
+Result: 3k tokens (CLAUDE.md) vs 5k (source code)
 ```
 
 ---

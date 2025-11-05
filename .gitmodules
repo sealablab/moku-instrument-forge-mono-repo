@@ -1,6 +1,3 @@
-[submodule "forge"]
-	path = forge
-	url = https://github.com/sealablab/moku-instrument-forge.git
 [submodule "libs/forge-vhdl"]
 	path = libs/forge-vhdl
 	url = https://github.com/sealablab/moku-instrument-forge-vhdl.git
