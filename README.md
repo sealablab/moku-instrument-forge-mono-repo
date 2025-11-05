@@ -167,11 +167,24 @@ Expected output:
 
 ### Setup Python Environment
 
+This monorepo uses **uv workspace mode** - the root is a pure workspace container (no package built at root level).
+
 ```bash
+# Install dependencies (workspace mode)
 uv sync
+
+# Verify imports work
 python scripts/setup_forge_path.py  # Verify forge imports
-pytest                               # Run tests
+
+# Run tests across all workspace members
+pytest
 ```
+
+**How workspace mode works:**
+- Root `pyproject.toml` declares workspace members (submodules)
+- No build system at root - each submodule has its own
+- Shared dependencies defined at root, available to all members
+- Cross-submodule imports work seamlessly
 
 ---
 

@@ -106,20 +106,34 @@ git submodule status --recursive
 For each submodule you don't need:
 
 ```bash
-# Remove the submodule
+# 1. Remove the submodule
 git rm libs/unwanted-module/
 
-# Commit the removal
+# 2. Update workspace members in pyproject.toml
+# Edit pyproject.toml and remove from [tool.uv.workspace] members list
+
+# 3. Update workspace
+uv sync
+
+# 4. Commit the removal
 git commit -m "chore: Remove unwanted-module (not needed for our use case)"
 ```
 
 **Example: Removing riscure-models if you're not using Riscure probes**
 ```bash
+# Remove git submodule
 git rm libs/riscure-models/
+
+# Edit pyproject.toml - remove "libs/riscure-models" from workspace members
+# Then sync workspace
+uv sync
+
+# Commit
 git commit -m "chore: Remove riscure-models (not using Riscure probes)"
 ```
 
 **Don't forget to update documentation:**
+- Remove from `[tool.uv.workspace] members` in `pyproject.toml` ⚠️ **CRITICAL**
 - Remove entry from `llms.txt`
 - Remove section from `CLAUDE.md`
 - Remove entry from `.claude/manifest.json`
@@ -190,9 +204,26 @@ mkdir -p your_module_name/
 # In your monorepo
 git submodule add https://github.com/yourusername/my-platform-models.git libs/my-platform-models/
 git submodule update --init libs/my-platform-models/
+
+# Add to workspace members in pyproject.toml
+# Edit [tool.uv.workspace] members = [...] to include "libs/my-platform-models"
+
+# Update workspace
+uv sync
 ```
 
 ### 5c. Update Monorepo Documentation
+
+**pyproject.toml** - Add to workspace members:
+```toml
+[tool.uv.workspace]
+members = [
+    "libs/forge-vhdl",
+    "libs/moku-models",
+    "libs/my-platform-models",  # Add your new module
+    "tools/forge-codegen",
+]
+```
 
 **llms.txt** - Add entry:
 ```markdown
@@ -295,16 +326,48 @@ Description of what it does
 
 ## Step 8: Set Up Python Environment
 
+This monorepo uses **uv workspace mode**, which means:
+- Root `pyproject.toml` is a pure workspace container (no package at root)
+- Each submodule is a workspace member with its own `[build-system]`
+- Shared dependencies defined at root level
+- No dummy package code required
+
 ```bash
-# Install dependencies
+# Install dependencies (workspace mode - no build at root)
 uv sync
 
-# Run tests (if any)
+# Run tests across all workspace members
 pytest
 
 # Verify imports work
 python scripts/setup_forge_path.py  # If using forge-codegen
 ```
+
+### Understanding Workspace Mode
+
+**What happens when you run `uv sync`:**
+1. uv reads root `pyproject.toml`
+2. Finds workspace members in `[tool.uv.workspace]`
+3. Creates unified dependency graph
+4. Installs all dependencies in single `.venv/`
+5. Makes all workspace members importable
+
+**When you add/remove submodules:**
+- Update `[tool.uv.workspace] members = [...]` in root `pyproject.toml`
+- Run `uv sync` to update workspace
+
+**Example: After removing riscure-models:**
+```toml
+[tool.uv.workspace]
+members = [
+    "libs/forge-vhdl",
+    "libs/moku-models",
+    # "libs/riscure-models",  # Removed
+    "tools/forge-codegen",
+]
+```
+
+Then run: `uv sync`
 
 ---
 

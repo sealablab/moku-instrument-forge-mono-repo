@@ -116,6 +116,70 @@ Three tiers for token efficiency:
 
 ---
 
+## Workspace Mode Architecture
+
+This monorepo uses **uv workspace mode**, which means:
+- The root is a **pure workspace container** (no package built at root)
+- Each submodule is an independent workspace member
+- Shared dependencies are defined at root level
+- **No dummy package code required**
+
+### Why Workspace Mode?
+
+**Conceptual Clarity:**
+```
+Traditional: Monorepo pretends to be a package (confusing)
+Workspace:   Monorepo IS a workspace (honest, clear)
+```
+
+**Key Benefits:**
+- ✅ No build errors from missing package code
+- ✅ Unified dependency management across submodules
+- ✅ Cross-submodule imports work seamlessly
+- ✅ Each submodule keeps its own `[build-system]`
+- ✅ Clean separation of concerns
+
+### Workspace Configuration
+
+The root `pyproject.toml` declares workspace members:
+
+```toml
+[tool.uv.workspace]
+members = [
+    "libs/forge-vhdl",
+    "libs/moku-models",
+    "libs/riscure-models",
+    "tools/forge-codegen",
+]
+
+# NO [build-system] at root - this is pure workspace!
+```
+
+### Adding/Removing Workspace Members
+
+**Add a new member:**
+```toml
+[tool.uv.workspace]
+members = [
+    "libs/forge-vhdl",
+    "libs/your-new-module",  # Add here
+    "tools/forge-codegen",
+]
+```
+
+**Remove a member:**
+```bash
+# Remove the submodule
+git rm libs/unwanted-module/
+
+# Remove from workspace members list in pyproject.toml
+# Then: uv sync
+```
+
+**After changes:** Run `uv sync` to update the workspace dependency graph.
+
+---
+
 ## Current Architecture (v2.0.0)
 
 ### Tools
