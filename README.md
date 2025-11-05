@@ -1,11 +1,61 @@
 # moku-instrument-forge-mono-repo
 
-Monorepo for developing Moku custom EMFI probe drivers using the forge framework.
+**Composable Monorepo Template for Embedded Instrument Development**
 
-**Status:** Architecture refactored ✅
+This is a **template repository** demonstrating a clean, AI-navigable architecture for building embedded instrument development environments using git submodules with integrated 3-tier documentation.
+
+**Use this template for:**
+- Starting your own instrument development monorepo
+- Learning composable git submodule patterns
+- Building AI-assisted development workflows
+
+**Current Example:** Moku custom EMFI probe drivers using the forge framework
+
+**Status:** Template-Ready ✅
 **Version:** `v2.0.0` (2025-11-04)
-**Architecture:** Clean separation - tools, libraries, and legacy code
-**Latest update:** Lifted foundational libraries, introduced forge-codegen
+**Architecture:** Clean separation - tools, libraries, AI agents
+**Template Features:** 3-tier docs, composable submodules, LLM-optimized
+
+---
+
+## 🚀 Using This Template
+
+### Quick Start
+
+**Option 1: GitHub Template** (Recommended)
+```bash
+# 1. Click "Use this template" button on GitHub
+# 2. Clone your new repository
+git clone --recurse-submodules <your-repo-url>
+cd your-repo
+
+# 3. Customize for your needs
+# See TEMPLATE.md for step-by-step guide
+```
+
+**Option 2: Direct Clone**
+```bash
+git clone --recurse-submodules https://github.com/sealablab/moku-instrument-forge-mono-repo.git
+cd moku-instrument-forge-mono-repo
+# Then customize as needed
+```
+
+### Customization
+
+**For AI Assistance:**
+- Run `/customize-monorepo` command in Claude Code
+- AI will guide you through adapting the template
+
+**Manual Customization:**
+- See **[TEMPLATE.md](TEMPLATE.md)** for step-by-step guide
+- See **[CLAUDE.md](CLAUDE.md)** for complete architecture documentation
+- See **[.claude/manifest.json](.claude/manifest.json)** for programmatic structure
+
+**Common Scenarios:**
+- Different platform? Remove `libs/moku-models/`, add your platform models
+- Different probes? Remove `libs/riscure-models/`, add your probe specs
+- No VHDL? Remove `libs/forge-vhdl/` and `tools/forge-codegen/`
+- Just models? Keep only `libs/*-models/`
 
 ---
 
