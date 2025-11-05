@@ -2,87 +2,100 @@
 
 Monorepo for developing Moku custom EMFI probe drivers using the forge framework.
 
-**Status:** Phase 4 complete, Option A architecture validated ✅
-**Version:** `v0.1.0-phase4` (2025-11-03)
-**Architecture:** Agent-based development workflow with forge/apps/ as workspace
-**Synchronized:** `monorepo-init-v1.0.0` (2025-11-03)
+**Status:** Architecture refactored ✅
+**Version:** `v2.0.0` (2025-11-04)
+**Architecture:** Clean separation - tools, libraries, and legacy code
+**Latest update:** Lifted foundational libraries, introduced forge-codegen
 
 ---
 
 ## Monorepo Structure
 
-This repository is composed of git submodules organized in a hierarchical structure:
+This repository uses git submodules organized in a flat, clean hierarchy:
 
-### [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge)
-> **Location:** `forge/`
-> **Purpose:** Code generation framework (YAML → VHDL)
+### Tools
 
-Generates VHDL interface code (shim + main template) from YAML specifications.
+#### [moku-instrument-forge-codegen](https://github.com/sealablab/moku-instrument-forge-codegen)
+> **Location:** `tools/forge-codegen/`
+> **Purpose:** YAML → VHDL code generator with type-safe register serialization
 
-#### [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes)
-> **Location:** `forge/libs/basic-app-datatypes/`
-> **Purpose:** Pydantic models for register package types
+**NEW!** Fresh, self-contained code generator with flattened `basic_serialized_datatypes` (internal serialization engine).
 
-#### [moku-models](https://github.com/sealablab/moku-models)
-> **Location:** `forge/libs/moku-models/`
-> **Purpose:** Moku platform specifications (Go/Lab/Pro/Delta)
+### Foundational Libraries
 
-#### [riscure-models](https://github.com/sealablab/riscure-models)
-> **Location:** `forge/libs/riscure-models/`
-> **Purpose:** Riscure probe hardware specifications (DS1120A/DS1140A)
-
-### [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl)
+#### [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl)
 > **Location:** `libs/forge-vhdl/`
-> **Purpose:** Shared VHDL utilities and packages
+> **Purpose:** Reusable VHDL components
 
-Provides reusable VHDL components:
+Provides common VHDL utilities:
 - **packages/** - Common types, voltage utilities, LUTs
 - **debugging/** - FSM observer for hardware debugging
 - **loader/** - BRAM initialization utilities
 - **utilities/** - Clock dividers, triggers, helpers
 
+#### [moku-models](https://github.com/sealablab/moku-models)
+> **Location:** `libs/moku-models/`
+> **Purpose:** Moku platform specifications (Go/Lab/Pro/Delta)
+
+Pydantic models for platform specs, deployment configs, signal routing.
+
+#### [riscure-models](https://github.com/sealablab/riscure-models)
+> **Location:** `libs/riscure-models/`
+> **Purpose:** Riscure probe hardware specifications (DS1120A/DS1140A)
+
+Pydantic models for probe specs, voltage safety validation.
+
+### Legacy
+
+#### [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge) ⚠️ DEPRECATED
+> **Location:** `forge/`
+> **Status:** Superseded by `tools/forge-codegen/`
+
+**Note:** This is the legacy code generator with nested submodules. Use `tools/forge-codegen/` for new development.
+
 ---
 
-## Directory Layout (Option A Architecture)
+## Directory Layout
 
 ```
 moku-instrument-forge-mono-repo/
 │
-├── forge/                              # Submodule: moku-instrument-forge
-│   ├── apps/                           # Probe packages (YAML + generated VHDL)
-│   │   └── DS1140_PD/                  # Example probe package
-│   │       ├── DS1140_PD.yaml          # Source specification
-│   │       ├── *_shim.vhd              # Auto-generated interface
-│   │       ├── *_main.vhd              # Template for implementation
-│   │       └── README.md               # Documentation
-│   ├── generator/                      # YAML → VHDL code generation
-│   ├── templates/                      # Jinja2 templates
-│   └── libs/
-│       ├── basic-app-datatypes/        # Submodule: Register types
-│       ├── moku-models/                # Submodule: Platform specs
-│       └── riscure-models/             # Submodule: Probe specs
+├── tools/                              # Development tools
+│   └── forge-codegen/                  # Submodule: YAML → VHDL generator
+│       ├── forge_codegen/
+│       │   ├── basic_serialized_datatypes/  # Type system (internal)
+│       │   ├── generator/              # Code generation engine
+│       │   ├── models/                 # Pydantic models
+│       │   ├── templates/              # Jinja2 VHDL templates
+│       │   └── vhdl/                   # Frozen type packages
+│       ├── tests/                      # 69 tests
+│       └── docs/                       # High-quality documentation
 │
-├── libs/
+├── libs/                               # Foundational libraries
 │   ├── forge-vhdl/                     # Submodule: VHDL utilities
-│   └── platform/common/                # Platform-specific VHDL (future)
+│   ├── moku-models/                    # Submodule: Platform specs
+│   ├── riscure-models/                 # Submodule: Probe specs
+│   └── platform/                       # Platform-specific VHDL
 │
-├── .claude/                            # AI agent configurations (Phase 4)
-│   ├── agents/                         # Monorepo-level agents
-│   │   ├── deployment-orchestrator/    # Package → hardware deployment
-│   │   ├── hardware-debug/             # FSM debugging
-│   │   └── probe-design-orchestrator/  # Probe workflow coordination
+├── forge/                              # LEGACY: Old code generator (deprecated)
+│   ├── apps/                           # Historical probe packages
+│   └── [nested submodules]             # Superseded by flat structure
+│
+├── .claude/                            # AI agent configurations
+│   ├── agents/                         # Specialized agents
 │   ├── commands/                       # Slash commands
-│   └── shared/                         # Shared documentation
+│   ├── workflows/                      # Reusable workflows
+│   └── shared/                         # Architecture docs
 │
-├── tests/                              # Shared test infrastructure
+├── docs/                               # Monorepo documentation
 ├── scripts/                            # Helper scripts
-└── pyproject.toml                      # Python dependencies + pytest config
+└── pyproject.toml                      # Python workspace config
 ```
 
-**Key Change (Option A):** All probe development happens in `forge/apps/<probe_name>/`:
-- YAML specifications
-- Generated VHDL files
-- User implementation
+**New Architecture:** Clean separation
+- **tools/** - Code generation (forge-codegen)
+- **libs/** - Foundational libraries (flat, no nesting)
+- **forge/** - Legacy (deprecated, kept for reference)
 
 ---
 
@@ -90,14 +103,12 @@ moku-instrument-forge-mono-repo/
 
 ### Clone with Submodules
 
-**Note:** This repository uses **nested submodules** - the `forge/` submodule contains three additional submodules (`libs/basic-app-datatypes`, `libs/moku-models`, `libs/riscure-models`). The `--recurse-submodules` flag handles this automatically.
-
 ```bash
 git clone --recurse-submodules https://github.com/sealablab/moku-instrument-forge-mono-repo.git
 cd moku-instrument-forge-mono-repo
 ```
 
-Already cloned? Initialize all submodules (including nested ones):
+Already cloned? Initialize all submodules:
 
 ```bash
 git submodule update --init --recursive
@@ -111,11 +122,11 @@ git submodule status --recursive
 
 Expected output:
 ```
- <commit-hash> forge (tag)
- <commit-hash> forge/libs/basic-app-datatypes (tag)
- <commit-hash> forge/libs/moku-models (tag)
- <commit-hash> forge/libs/riscure-models (tag)
+ <commit-hash> forge (LEGACY)
  <commit-hash> libs/forge-vhdl (tag)
+ <commit-hash> libs/moku-models (tag)
+ <commit-hash> libs/riscure-models (tag)
+ <commit-hash> tools/forge-codegen (tag)
 ```
 
 ### Setup Python Environment
@@ -130,21 +141,58 @@ pytest                               # Run tests
 
 ## Documentation
 
-Each submodule maintains its own documentation:
+Each submodule follows a **3-tier documentation system**:
 
-| Repository | Purpose | Documentation |
-|------------|---------|---------------|
-| [moku-instrument-forge](https://github.com/sealablab/moku-instrument-forge) | Code generation (YAML → VHDL) | [forge/README.md](forge/README.md) |
-| [moku-instrument-forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl) | Shared VHDL utilities | [libs/forge-vhdl/README.md](libs/forge-vhdl/README.md) |
-| [basic-app-datatypes](https://github.com/sealablab/basic-app-datatypes) | Register package types | [forge/libs/basic-app-datatypes/README.md](forge/libs/basic-app-datatypes/README.md) |
-| [moku-models](https://github.com/sealablab/moku-models) | Platform specifications | [forge/libs/moku-models/README.md](forge/libs/moku-models/README.md) |
-| [riscure-models](https://github.com/sealablab/riscure-models) | Probe specifications | [forge/libs/riscure-models/README.md](forge/libs/riscure-models/README.md) |
+| Repository | Purpose | Quick Ref | Full Guide |
+|------------|---------|-----------|------------|
+| [forge-codegen](https://github.com/sealablab/moku-instrument-forge-codegen) | YAML → VHDL generator | [llms.txt](tools/forge-codegen/llms.txt) | [CLAUDE.md](tools/forge-codegen/CLAUDE.md) |
+| [forge-vhdl](https://github.com/sealablab/moku-instrument-forge-vhdl) | VHDL utilities | [llms.txt](libs/forge-vhdl/llms.txt) | [CLAUDE.md](libs/forge-vhdl/CLAUDE.md) |
+| [moku-models](https://github.com/sealablab/moku-models) | Platform specs | [llms.txt](libs/moku-models/llms.txt) | [CLAUDE.md](libs/moku-models/CLAUDE.md) |
+| [riscure-models](https://github.com/sealablab/riscure-models) | Probe specs | [llms.txt](libs/riscure-models/llms.txt) | [CLAUDE.md](libs/riscure-models/CLAUDE.md) |
+
+**Progressive disclosure:** Start with llms.txt (~500-1000 tokens), escalate to CLAUDE.md (~3-5k tokens) for complete context.
+
+---
+
+## Architecture Migration (v2.0.0)
+
+**What changed (2025-11-04):**
+
+1. **Created forge-codegen** - Fresh, self-contained YAML → VHDL generator
+   - Flattened `basic_serialized_datatypes` (no longer separate repo)
+   - Clean package naming: `forge_codegen` (was `forge`)
+   - All imports updated, 69 tests passing
+
+2. **Lifted foundational libraries** - Moved to top-level `libs/`
+   - `libs/moku-models/` (was `forge/libs/moku-models/`)
+   - `libs/riscure-models/` (was `forge/libs/riscure-models/`)
+   - Now peers with `libs/forge-vhdl/`
+
+3. **Deprecated old forge** - Kept at `forge/` for reference
+   - Contains historical probe packages in `forge/apps/`
+   - Nested submodule structure superseded
+   - Use `tools/forge-codegen/` for new development
+
+**Benefits:**
+- Clean separation (tools vs libraries)
+- No nested submodules
+- Simplified maintenance
+- Better naming (forge_codegen vs ambiguous "forge")
 
 ---
 
 ## Development Workflow
 
-### Adding a New Probe (Option A)
+### Using forge-codegen
+
+```bash
+# Generate VHDL from YAML spec
+python -m forge_codegen.generator.codegen spec.yaml --output-dir generated/
+```
+
+See [tools/forge-codegen/](tools/forge-codegen/) for complete documentation.
+
+### Adding a New Probe (Legacy)
 
 1. **Initialize probe directory:**
    ```bash
